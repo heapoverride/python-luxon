@@ -25,7 +25,7 @@ class Title(Tag):
             self.add(title)
 
 """
-Defines metadata of an HTML document
+Defines the metadata of an HTML document
 """
 class Meta(Tag):
     def __init__(self):
@@ -126,3 +126,13 @@ class Img(Tag):
         super().__init__("img")
         self.nobody = True
         self.set("src", src)
+
+"""
+Comments are not displayed in the browsers but they're visible in the source code
+"""
+class Comment(Tag):
+    def __init__(self, comment: str):
+        super().__init__(None)
+        self.set_text(comment)
+        self.before = "<!-- "
+        self.after = " -->"
