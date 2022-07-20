@@ -38,10 +38,19 @@ class Style(Tag):
     def __init__(self, source: str = None):
         if source != None:
             super().__init__("link")
+            self.nobody = True
             self.set("rel", "stylesheet")
             self.set("href", source)
         else:
-            super().__init__("source")
+            super().__init__("style")
+
+    def set_style(self, css_text: str):
+        if self.name != "style": return self
+
+        css_text = Text(css_text)
+        css_text.escape = False
+        self.tags = [css_text]
+        return self
 
 """
 Represents a relationship between current document and an external resource
@@ -49,6 +58,7 @@ Represents a relationship between current document and an external resource
 class Link(Tag):
     def __init__(self, relation: str, target: str, media_type: str = None):
         super().__init__("link")
+        self.nobody = True
         self.set("rel", relation)
         self.set("href", target)
         if media_type != None:
@@ -336,12 +346,11 @@ class Script(Tag):
     def __init__(self, source: str = None):
         super().__init__("script")
         if source != None: self.set("src", source)
-        self.escape = False
 
     def set_code(self, code: str):
-        text = Text(code)
-        text.escape = False
-        self.tags = [text]
+        code = Text(code)
+        code.escape = False
+        self.tags = [code]
         return self
 
 """
