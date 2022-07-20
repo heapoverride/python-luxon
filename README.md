@@ -4,7 +4,7 @@ This repository contains some parts of my Luxon framework (PHP) implemented usin
 ### Code examples
 #### HTML generator
 ```py
-from luxon.html import *
+from luxon.html.tags import *
 
 def main():
     fruits = Ul()
