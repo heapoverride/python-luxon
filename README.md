@@ -1,8 +1,8 @@
 # Python Luxon
 This repository contains some parts of my Luxon framework (PHP) implemented using Python.
 
-# Code examples
-### HTML generator
+### Code examples
+#### HTML generator
 ```py
 from luxon.html import *
 
