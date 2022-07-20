@@ -6,7 +6,7 @@ from typing import Callable
 class Tag:
     def __init__(self, name: str):
         self.name: str = name
-        self.attributes: dict[str, str] = {}
+        self.attributes: dict[str, str|True] = {}
         self.classes: list[str] = []
         self.styles: dict[str, str] = {}
         self.tags: list[Tag|str] = []
@@ -173,10 +173,10 @@ class Tag:
 
             temp = []
             for key, value in self.attributes.items():
-                if value != "":
-                    temp.append(f"{self.__escape(key)}=\"{self.__escape(value, force=True)}\"")
-                else:
+                if value == True:
                     temp.append(self.__escape(key))
+                else:
+                    temp.append(f"{self.__escape(key)}=\"{self.__escape(value, force=True)}\"")
             result.append(" ".join(temp))
 
             # Add child tags

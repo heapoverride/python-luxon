@@ -442,10 +442,10 @@ class Audio(Tag):
     def __init__(self, source: str = None, autoplay: bool = False, controls: bool = False, loop: bool = False, muted: bool = False, preload: str = None):
         super().__init__("audio")
         if source: self.set("src", source)
-        if autoplay: self.set("autoplay", "")
-        if controls: self.set("controls", "")
-        if loop: self.set("loop", "")
-        if muted: self.set("muted", "")
+        if autoplay: self.set("autoplay", True)
+        if controls: self.set("controls", True)
+        if loop: self.set("loop", True)
+        if muted: self.set("muted", True)
         if preload: self.set("preload", preload)
 
 """
@@ -458,10 +458,10 @@ class Video(Tag):
         if width: self.set("width", str(width))
         if height: self.set("height", str(height))
         if poster: self.set("poster", poster)
-        if autoplay: self.set("autoplay", "")
-        if controls: self.set("controls", "")
-        if loop: self.set("loop", "")
-        if muted: self.set("muted", "")
+        if autoplay: self.set("autoplay", True)
+        if controls: self.set("controls", True)
+        if loop: self.set("loop", True)
+        if muted: self.set("muted", True)
         if preload: self.set("preload", preload)
 
 """
