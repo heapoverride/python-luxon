@@ -98,7 +98,7 @@ class Tag:
             return self.styles[property]
         return None
 
-    # Find tag using callable
+    # Find a tag
     def find_one(self, func: Callable[[Tag], bool], recurse: bool = False) -> Tag|None:
         for tag in self.tags:
             if type(tag) != Text:
@@ -106,7 +106,7 @@ class Tag:
                 if recurse: 
                     _tag = tag.find_one(func, recurse=recurse)
                     if _tag != None: return _tag
-    
+
     @staticmethod
     def __find_many(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = False, max_depth: int = -1):
         if max_depth != -1: max_depth -= 1
@@ -117,6 +117,7 @@ class Tag:
                 if recurse and max_depth != 0: 
                     Tag.__find_many(_tag, func, result, recurse=recurse, max_depth=max_depth)
 
+    # Find many tags
     def find_many(self, func: Callable[[Tag], bool], recurse: bool = False, max_depth: int = -1) -> list[Tag]:
         result = []
         Tag.__find_many(self, func, result, recurse=recurse, max_depth=max_depth)
@@ -150,7 +151,7 @@ class Tag:
         if self.is_text:
             #if pretty and depth > 0:
             #    result.append("\n" + self.__indent(depth))
-            result.append(self.__escape(self.text, force=True))
+            result.append(self.__escape(self.text))
         else:
             # Add opening tag
             if pretty and depth > 0:
@@ -172,7 +173,10 @@ class Tag:
 
             temp = []
             for key, value in self.attributes.items():
-                temp.append(f"{self.__escape(key)}=\"{self.__escape(value, force=True)}\"")
+                if value != "":
+                    temp.append(f"{self.__escape(key)}=\"{self.__escape(value, force=True)}\"")
+                else:
+                    temp.append(self.__escape(key))
             result.append(" ".join(temp))
 
             # Add child tags
