@@ -10,7 +10,7 @@ class Head(Tag):
         super().__init__("head")
 
 class Title(Tag):
-    def __init__(self, title: Text|str = None):
+    def __init__(self, title: str|Text = None):
         super().__init__("title")
         if title != None:
             self.add(title)
