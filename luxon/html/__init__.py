@@ -99,16 +99,18 @@ class Tag:
         return None
 
     # Find a tag
-    def find_one(self, func: Callable[[Tag], bool], recurse: bool = False) -> Tag|None:
+    def find_one(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = -1) -> Tag|None:
+        if max_depth != -1: max_depth -= 1
+
         for tag in self.tags:
             if type(tag) != Text:
                 if func(tag): return tag
-                if recurse: 
+                if recurse and max_depth != 0: 
                     _tag = tag.find_one(func, recurse=recurse)
                     if _tag != None: return _tag
 
     @staticmethod
-    def __find_many(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = False, max_depth: int = -1):
+    def __find_many(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = True, max_depth: int = -1):
         if max_depth != -1: max_depth -= 1
         
         for _tag in tag.tags:
@@ -118,7 +120,7 @@ class Tag:
                     Tag.__find_many(_tag, func, result, recurse=recurse, max_depth=max_depth)
 
     # Find many tags
-    def find_many(self, func: Callable[[Tag], bool], recurse: bool = False, max_depth: int = -1) -> list[Tag]:
+    def find_many(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = -1) -> list[Tag]:
         result = []
         Tag.__find_many(self, func, result, recurse=recurse, max_depth=max_depth)
         return result
