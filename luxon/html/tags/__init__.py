@@ -49,7 +49,7 @@ class Style(Tag):
 
         css_text = Text(css_text)
         css_text.escape = False
-        self.tags = [css_text]
+        self.add(css_text)
         return self
 
 """
@@ -355,7 +355,7 @@ class Script(Tag):
     def set_code(self, code: str):
         code = Text(code)
         code.escape = False
-        self.tags = [code]
+        self.add(code)
         return self
 
 """
