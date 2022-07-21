@@ -40,11 +40,11 @@ class Tag:
         return self
 
     # Set & get attribute
-    def set(self, attribute: str, value: str):
+    def set(self, attribute: str, value: str|True = True):
         self.attributes[attribute] = value
         return self
 
-    def get(self, attribute: str) -> str|None:
+    def get(self, attribute: str) -> str|True|None:
         if attribute in self.attributes:
             return self.attributes[attribute]
         return None
@@ -98,7 +98,7 @@ class Tag:
             return self.styles[property]
         return None
 
-    # Find a tag
+    # Find a single tag
     def find(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> Tag|None:
         if max_depth != None: max_depth -= 1
 
@@ -120,7 +120,7 @@ class Tag:
                 if recurse and (max_depth == None or max_depth > -1): 
                     Tag.__find_all(_tag, func, result, recurse=recurse, max_depth=max_depth)
 
-    # Find many tags
+    # Find tags
     def find_all(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> list[Tag]:
         result = []
         Tag.__find_all(self, func, result, recurse=recurse, max_depth=max_depth)
@@ -161,6 +161,14 @@ class Tag:
     # Find tags by class name
     def find_all_by_class(self, class_name: str):
         return self.find_all(lambda tag: class_name in tag.classes)
+
+    # Find tag by attribute value
+    def find_by_attribute(self, attribute: str, value: str|True = True):
+        return self.find(lambda tag: tag.get(attribute) == value)
+
+    # Find tags by attribute value
+    def find_all_by_attribute(self, attribute: str, value: str|True = True):
+        return self.find_all(lambda tag: tag.get(attribute) == value)
 
     # Escape HTML code if escape option is set
     def __escape(self, input: str, force: bool = False) -> str:
