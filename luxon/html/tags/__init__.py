@@ -328,18 +328,24 @@ class Form(Tag):
 Defines an input field within an HTML form
 """
 class Input(Tag):
-    def __init__(self, type: str):
+    def __init__(self, type: str, id: str = None, name: str = None, value: str = None):
         super().__init__("input")
         self.set("type", type.lower())
         self.nobody = True
+        if id: self.set_id(id)
+        if name: self.set_name(name)
+        if value: self.set_value(value)
 
 """
 Used to define multiple line input, such as comment, feedback, and review
 """
 class Textarea(Tag):
-    def __init__(self):
+    def __init__(self, id: str = None, name: str = None, width: int = None, height: int = None):
         super().__init__("textarea")
-
+        if id: self.set_id(id)
+        if name: self.set_name(name)
+        if width: self.set("width", str(width))
+        if height: self.set("height", str(height))
 """
 Used to declare the JavaScript within HTML document
 """
@@ -358,9 +364,10 @@ class Script(Tag):
 Represents a control which provides a menu of options
 """
 class Select(Tag):
-    def __init__(self, id: str = None):
+    def __init__(self, id: str = None, name: str = None):
         super().__init__("select")
         if id: self.set_id(id)
+        if name: self.set_name(name)
 
 """
 Used to define options or items in a drop-down list (Select)
@@ -471,17 +478,17 @@ Defines the head cell of an HTML table
 Used with Thead
 """
 class Th(Tag):
-    def __init__(self, content: str|Tag = None):
+    def __init__(self, *content: str|Tag):
         super().__init__("th")
-        if content: self.add(content)
+        self.add(*content)
 
 """
 Used to define cells of an HTML table which contains table data
 """
 class Td(Tag):
-    def __init__(self, content: str|Tag = None):
+    def __init__(self, *content: str|Tag):
         super().__init__("td")
-        if content: self.add(content)
+        self.add(*content)
 
 """
 Defines multiple media recourses for different media element such as Picture, Video, and Audio
@@ -533,49 +540,55 @@ class Video(Tag):
 Heading 1
 """
 class H1(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h1")
+        self.add(*content)
 
 """
 Heading 2
 """
 class H2(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h2")
+        self.add(*content)
 
 """
 Heading 3
 """
 class H3(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h3")
+        self.add(*content)
 
 """
 Heading 4
 """
 class H4(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h4")
+        self.add(*content)
 
 """
 Heading 5
 """
 class H5(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h5")
+        self.add(*content)
 
 """
 Heading 6
 """
 class H6(Tag):
-    def __init__(self): 
+    def __init__(self, *content: str|Tag): 
         super().__init__("h6")
+        self.add(*content)
 
 """
 Used to define text tracks for Audio and Video
 """
 class Track(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("track")
 
 """
@@ -683,9 +696,9 @@ class Ul(Tag):
 Used to represent items in list
 """
 class Li(Tag):
-    def __init__(self, content: Tag|str):
+    def __init__(self, *content: Tag|str):
         super().__init__("li")
-        self.add(content)
+        self.add(*content)
 
 """
 Used to insert an image within an HTML document
