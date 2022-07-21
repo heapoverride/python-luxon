@@ -50,6 +50,11 @@ class Tag:
         self.__tags.clear()
         return self
 
+    # Insert tags at index
+    def insert(self, index: int, *tags: Tag|list[Tag|str]|str):
+        for tag in tags[::-1]:
+            self.__tags.insert(index, tag)
+
     # Remove all children tags where lambda expression is true
     def remove_where(self, func: Callable[[Tag], bool]):
         i = 0

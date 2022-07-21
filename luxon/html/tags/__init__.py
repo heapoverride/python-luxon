@@ -95,8 +95,9 @@ class Footer(Tag):
 Used for styling and grouping inline
 """
 class Span(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("span")
+        self.add(*content)
 
 """
 Defines a division or section within HTML document
@@ -124,29 +125,33 @@ class Aside(Tag):
 Defines additional details which user can either view or hide
 """
 class Details(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("details")
+        self.add(*content)
 
 """
 Used to add a caption or explanation for the Figure element
 """
 class Figcaption(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("figcaption")
+        self.add(*content)
 
 """
 Used to define a caption for a table
 """
 class Caption(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("caption")
+        self.add(*content)
 
 """
 Used to define the title of the work, book, website, ...
 """
 class Cite(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("cite")
+        self.add(*content)
 
 """
 Used to define the self-contained content
@@ -159,8 +164,9 @@ class Figure(Tag):
 Represents a highlighted text
 """
 class Mark(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("mark")
+        self.add(*content)
 
 """
 Represents section of page to represent navigation links
@@ -180,15 +186,17 @@ class Section(Tag):
 Defines summary which can be used with Details
 """
 class Summary(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("summary")
+        self.add(*content)
 
 """
 Define data/time within an HTML document
 """
 class Time(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("time")
+        self.add(*content)
 
 """
 Creates a hyperlink or link
@@ -212,8 +220,9 @@ class Area(Tag):
 Used to define a content which is taken from another source
 """
 class Blockquote(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("blockquote")
+        self.add(*content)
 
 """
 Produces a line break in text (carriage-return)
@@ -250,8 +259,9 @@ class Canvas(Tag):
 Used to display a part of programming code in an HTML document
 """
 class Code(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("code")
+        self.add(*content)
 
 """
 Ddefines a column within a Table which represent common properties of columns and used with the Colgroup
@@ -302,12 +312,16 @@ class Fieldset(Tag):
     def __init__(self):
         super().__init__("fieldset")
 
+    def add_legend(self, *content: str|Tag):
+        self.add(Legend(*content))
+
 """
 Defines a caption for content of Fieldset
 """
 class Legend(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("legend")
+        self.add(*content)
 
 """
 Used to define an HTML form
