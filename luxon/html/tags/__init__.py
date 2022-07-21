@@ -516,6 +516,7 @@ class Picture(Tag):
 
     def add_image(self, source: str, alt: str = None):
         self.add(Img(source, alt))
+        return self
 
 
 """
