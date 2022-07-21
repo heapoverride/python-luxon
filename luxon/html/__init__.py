@@ -225,25 +225,25 @@ class Tag:
 
     # Produce HTML source code
     def html(self, pretty: bool = False, depth: int = 0) -> str:
-        result: list[str] = []
+        result: str = ""
 
         # Add before element
         if self.before != None:
             if pretty and depth > 0:
-                result.append("\n" + self.__indent(depth))
-            result.append(str(self.before))
+                result += "\n" + self.__indent(depth)
+            result += str(self.before)
 
         # Check if this element is a text element
         if self.is_text:
             #if pretty and depth > 0:
-            #    result.append("\n" + self.__indent(depth))
-            result.append(self.__escape(str(self.text)))
+            #    result += "\n" + self.__indent(depth)
+            result += self.__escape(str(self.text))
         else:
             # Add opening tag
             if pretty and depth > 0:
-                result.append("\n" + self.__indent(depth))
+                result += "\n" + self.__indent(depth)
             has_props = len(self.attributes) + len(self.classes) + len(self.styles) > 0
-            result.append(f"<{self.name}" + (" " if has_props else ""))
+            result += f"<{self.name}" + (" " if has_props else "")
 
             # Add attributes & styles
             attributes = self.attributes
@@ -263,29 +263,29 @@ class Tag:
                     temp.append(self.__escape(key))
                 else:
                     temp.append(f"{self.__escape(key)}=\"{self.__escape(str(value), force=True)}\"")
-            result.append(" ".join(temp))
+            result += " ".join(temp)
 
             # Add child tags
             has_text = False
             if not self.nobody:
-                result.append(">")
+                result += ">"
                 
                 new_depth = depth + 1
                 for tag in self.tags:
                     if type(tag) == Text: 
                         has_text = True
-                    result.append(tag.html(pretty, new_depth))
+                    result += tag.html(pretty, new_depth)
 
             # Add closing tag
             if not self.nobody and not has_text and len(self.tags) != 0 and pretty:
-                result.append("\n" + self.__indent(depth))
-            result.append(" />" if self.nobody else f"</{self.name}>")
+                result += "\n" + self.__indent(depth)
+            result += " />" if self.nobody else f"</{self.name}>"
 
         # Add after element
         if self.after != None:
-            result.append(str(self.after))
+            result += str(self.after)
 
-        return "".join(result)
+        return result
 
     def __str__(self):
         return self.html()
