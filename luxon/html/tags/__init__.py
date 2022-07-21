@@ -1,3 +1,4 @@
+from __future__ import annotations
 from luxon.html import *
 
 """
@@ -386,6 +387,35 @@ class Table(Tag):
     def __init__(self):
         super().__init__("table")
 
+    def add_header_row(self, *cells: str|Tag):
+        self.add(Tr().add_headers(*cells))
+        return self
+
+    def add_row(self, *cells: str|Tag):
+        self.add(Tr().add_columns(*cells))
+        return self
+
+    def add_thead(self, *rows: list[str|Tag]):
+        thead = Thead()
+        for row in rows: 
+            thead.add_row(*row)
+        self.add(thead)
+        return self
+
+    def add_tbody(self, *rows: list[str|Tag]):
+        tbody = Tbody()
+        for row in rows: 
+            tbody.add_row(*row)
+        self.add(tbody)
+        return self
+
+    def add_tfoot(self, *rows: list[str|Tag]):
+        tfoot = Tfoot()
+        for row in rows: 
+            tfoot.add_row(*row)
+        self.add(tfoot)
+        return self
+
 """
 Defines the header of an HTML table
 It is used along with Tbody and Tfoot
@@ -394,12 +424,20 @@ class Thead(Tag):
     def __init__(self):
         super().__init__("thead")
 
+    def add_row(self, *columns: str|Tag):
+        self.add(Tr().add_headers(*columns))
+        return self
+
 """
 Represents the body content of an HTML table and used along with Thead and Tfoot
 """
 class Tbody(Tag):
     def __init__(self):
         super().__init__("tbody")
+
+    def add_row(self, *columns: str|Tag):
+        self.add(Tr().add_columns(*columns))
+        return self
 
 """
 Defines the footer content of an HTML table
@@ -408,13 +446,10 @@ class Tfoot(Tag):
     def __init__(self):
         super().__init__("tfoot")
 
-"""
-Defines the head cell of an HTML table
-Used with Thead
-"""
-class Th(Tag):
-    def __init__(self):
-        super().__init__("th")
+    def add_row(self, *columns: str|Tag) -> Tr:
+        row = Tr().add_columns(*columns)
+        self.add(row)
+        return row
 
 """
 Defines the row cells in an HTML table
@@ -423,12 +458,30 @@ class Tr(Tag):
     def __init__(self):
         super().__init__("tr")
 
+    def add_headers(self, *columns: str|Tag):
+        self.add([Th(x) for x in columns])
+        return self
+
+    def add_columns(self, *columns: str|Tag):
+        self.add([Td(x) for x in columns])
+        return self
+
+"""
+Defines the head cell of an HTML table
+Used with Thead
+"""
+class Th(Tag):
+    def __init__(self, content: str|Tag = None):
+        super().__init__("th")
+        if content: self.add(content)
+
 """
 Used to define cells of an HTML table which contains table data
 """
 class Td(Tag):
-    def __init__(self):
+    def __init__(self, content: str|Tag = None):
         super().__init__("td")
+        if content: self.add(content)
 
 """
 Defines multiple media recourses for different media element such as Picture, Video, and Audio
