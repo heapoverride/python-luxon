@@ -155,12 +155,13 @@ class Tag:
         return self.find_all(lambda tag: type(tag) == tag_type)
 
     # Find tag by class name
-    def find_by_class(self, class_name: str):
-        return self.find(lambda tag: class_name in tag.classes)
+    def find_by_class(self, *class_name: str):
+        return self.find(lambda tag: all(item in tag.classes for item in class_name))
 
     # Find tags by class name
-    def find_all_by_class(self, class_name: str):
-        return self.find_all(lambda tag: class_name in tag.classes)
+    def find_all_by_class(self, *class_name: str):
+        #return self.find_all(lambda tag: class_name in tag.classes)
+        return self.find_all(lambda tag: all(item in tag.classes for item in class_name))
 
     # Find tag by attribute value
     def find_by_attribute(self, attribute: str, value: str|True = True):
