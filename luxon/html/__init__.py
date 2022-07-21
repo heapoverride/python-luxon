@@ -39,6 +39,26 @@ class Tag:
 
         return self
 
+    # Remove a child tag
+    def remove(self, tag: Tag):
+        if tag in self.tags:
+            self.tags.remove(tag)
+        return self
+
+    # Remove all children tags
+    def remove_all(self):
+        self.tags.clear()
+        return self
+
+    # Remove all children tags where lambda expression is true
+    def remove_where(self, func: Callable[[Tag], bool]):
+        i = 0
+        while i < len(self.tags):
+            if func(self.tags[i]):
+                del self.tags[i]
+                i -= 1
+            i += 1
+
     # Set attribute with optional value
     def set(self, attribute: str, value: Any = True):
         self.attributes[attribute] = value
