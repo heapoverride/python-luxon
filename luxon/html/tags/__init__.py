@@ -44,7 +44,7 @@ class Style(Tag):
         else:
             super().__init__("style")
 
-    def set_style(self, css_text: str):
+    def add_style(self, css_text: str):
         if self.name != "style": return self
 
         css_text = Text(css_text)
@@ -352,7 +352,7 @@ class Script(Tag):
         super().__init__("script")
         if source: self.set("src", source)
 
-    def set_code(self, code: str):
+    def add_code(self, code: str):
         code = Text(code)
         code.escape = False
         self.add(code)
