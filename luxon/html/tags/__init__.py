@@ -357,15 +357,18 @@ class Script(Tag):
 Represents a control which provides a menu of options
 """
 class Select(Tag):
-    def __init__(self):
+    def __init__(self, id: str = None):
         super().__init__("select")
+        if id: self.set_id(id)
 
 """
 Used to define options or items in a drop-down list (Select)
 """
 class Option(Tag):
-    def __init__(self):
+    def __init__(self, text: str, value: str = None):
         super().__init__("option")
+        self.add(text)
+        if value: self.set_value(value)
 
 """
 Defines an inline frame which can embed other content

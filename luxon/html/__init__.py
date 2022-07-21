@@ -140,6 +140,11 @@ class Tag:
 
         return input
 
+    # Call a method with this instance as the first argument
+    def call(self, func: Callable[[Tag], None]):
+        func(self)
+        return self
+
     # Produce HTML source code
     def html(self, pretty: bool = False, depth: int = 0) -> str:
         result: list[str] = []
