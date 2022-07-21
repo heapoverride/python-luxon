@@ -143,9 +143,9 @@ class Tag:
 
         # Add before element
         if self.before != None:
-            result.append(self.before)
-            if pretty:
+            if pretty and depth > 0:
                 result.append("\n" + self.__indent(depth))
+            result.append(self.before)
 
         # Check if this element is a text element
         if self.is_text:

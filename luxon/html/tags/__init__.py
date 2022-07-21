@@ -6,7 +6,7 @@ Represents the root (top-level element) of an HTML document
 class Html(Tag):
     def __init__(self):
         super().__init__("html")
-        self.before = "<!DOCTYPE html>"
+        self.before = "<!DOCTYPE html>\n"
 
 """
 Defines the head section of an HTML document
