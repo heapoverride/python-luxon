@@ -99,7 +99,7 @@ class Tag:
         return None
 
     # Find a tag
-    def find_one(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> Tag|None:
+    def find(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> Tag|None:
         if max_depth != None: max_depth -= 1
 
         for tag in self.tags:
@@ -111,20 +111,56 @@ class Tag:
         return None
 
     @staticmethod
-    def __find_many(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = True, max_depth: int = None):
+    def __find_all(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = True, max_depth: int = None):
         if max_depth != None: max_depth -= 1
         
         for _tag in tag.tags:
             if type(_tag) != Text:
                 if func(_tag): result.append(_tag)
                 if recurse and (max_depth == None or max_depth > -1): 
-                    Tag.__find_many(_tag, func, result, recurse=recurse, max_depth=max_depth)
+                    Tag.__find_all(_tag, func, result, recurse=recurse, max_depth=max_depth)
 
     # Find many tags
-    def find_many(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> list[Tag]:
+    def find_all(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> list[Tag]:
         result = []
-        Tag.__find_many(self, func, result, recurse=recurse, max_depth=max_depth)
+        Tag.__find_all(self, func, result, recurse=recurse, max_depth=max_depth)
         return result
+
+    # Find tag by ID recursively
+    def find_by_id(self, id: str):
+        return self.find(lambda tag: tag.get_id() == id)
+
+    # Find tag by name attribute recursively
+    def find_by_name(self, name: str):
+        return self.find(lambda tag: tag.get_name() == name)
+
+    # Find tags by name attribute recursively
+    def find_all_by_name(self, name: str):
+        return self.find_all(lambda tag: tag.get_name() == name)
+
+    # Find tag by tag name recursively
+    def find_by_tagname(self, tagname: str):
+        return self.find(lambda tag: tag.name == tagname)
+
+    # Find tags by tag name recursively
+    def find_all_by_tagname(self, tagname: str):
+        return self.find_all(lambda tag: tag.name == tagname)
+
+    # Find tag by type
+    def find_by_type(self, tag_type: type):
+        return self.find(lambda tag: type(tag) == tag_type)
+
+    # Find tags by type
+    def find_all_by_type(self, tag_type: type):
+        return self.find_all(lambda tag: type(tag) == tag_type)
+
+    # Find tag by class name
+    def find_by_class(self, class_name: str):
+        return self.find(lambda tag: class_name in tag.classes)
+
+    # Find tags by class name
+    def find_all_by_class(self, class_name: str):
+        return self.find_all(lambda tag: class_name in tag.classes)
 
     # Escape HTML code if escape option is set
     def __escape(self, input: str, force: bool = False) -> str:
