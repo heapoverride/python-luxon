@@ -290,11 +290,11 @@ class Tag:
     # Overload slice/array access operator
     def __getitem__(self, slice: slice) -> Tag|list[Tag]:
         return self.tags[slice]
-        
+
     def __setitem__(self, slice: slice, tag: Tag):
         self.tags[slice] = tag
 
-    def __delitem__(self, slice: int):  
+    def __delitem__(self, slice: slice):  
         del self.tags[slice]
 
 
