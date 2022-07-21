@@ -497,7 +497,7 @@ class Source(Tag):
 
         if type(source) == str:
             self.set("src", source)
-        elif type(source) == list[str]:
+        elif type(source) == list:
             self.set("srcset", ",".join(source))
 
         if mime_type: self.set("type", mime_type)
