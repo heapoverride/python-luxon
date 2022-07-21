@@ -22,8 +22,7 @@ Defines the title or name of an HTML document
 class Title(Tag):
     def __init__(self, title: str|Text = None):
         super().__init__("title")
-        if title != None:
-            self.add(title)
+        if title: self.add(title)
 
 """
 Defines the metadata of an HTML document
@@ -37,7 +36,7 @@ Defines the style information for an HTML document
 """
 class Style(Tag):
     def __init__(self, source: str = None):
-        if source != None:
+        if source:
             super().__init__("link")
             self.nobody = True
             self.set("rel", "stylesheet")
@@ -62,8 +61,7 @@ class Link(Tag):
         self.nobody = True
         self.set("rel", relation)
         self.set("href", target)
-        if media_type != None:
-            self.set("type", media_type)
+        if media_type: self.set("type", media_type)
 
 """
 Defines the body section of an HTML document
@@ -321,7 +319,7 @@ class Form(Tag):
             method = "POST"
         self.set("method", method.upper())
         
-        if action != None: self.set("action", action)
+        if action: self.set("action", action)
         if multipart: self.set("enctype", "multipart/form-data")
 
 """
@@ -352,7 +350,7 @@ Used to declare the JavaScript within HTML document
 class Script(Tag):
     def __init__(self, source: str = None):
         super().__init__("script")
-        if source != None: self.set("src", source)
+        if source: self.set("src", source)
 
     def set_code(self, code: str):
         code = Text(code)
@@ -384,8 +382,7 @@ Defines an inline frame which can embed other content
 class Iframe(Tag):
     def __init__(self, source: str = None):
         super().__init__("iframe")
-        if source != None:
-            self.set("src", source)
+        if source: self.set("src", source)
 
 """
 Used to present data in tabular form or to create a table within HTML document
@@ -704,10 +701,11 @@ class Li(Tag):
 Used to insert an image within an HTML document
 """
 class Img(Tag):
-    def __init__(self, src: str):
+    def __init__(self, src: str, alt: str = None):
         super().__init__("img")
         self.nobody = True
         self.set("src", src)
+        if alt: self.set("alt", alt)
 
 """
 Comments are not displayed in the browsers but they're visible in the source code
