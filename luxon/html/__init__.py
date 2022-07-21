@@ -6,13 +6,13 @@ from typing import Callable
 class Tag:
     def __init__(self, name: str):
         self.name: str = name
-        self.attributes: dict[str, str|True] = {}
+        self.attributes: dict[str, Any] = {}
         self.classes: list[str] = []
         self.styles: dict[str, str] = {}
-        self.tags: list[Tag|str] = []
-        self.text: str = None
-        self.before: str = None
-        self.after: str = None
+        self.tags: list[Tag] = []
+        self.text: Any = None
+        self.before: Any = None
+        self.after: Any = None
         self.escape: bool = True
         self.nobody: bool = False
         self.is_text: bool = False
@@ -22,7 +22,7 @@ class Tag:
         return "    " * depth
 
     # Set text and mark this element a text element
-    def set_text(self, text: str):
+    def set_text(self, text: Any):
         self.is_text = True
         self.text = text
         return self
@@ -39,60 +39,72 @@ class Tag:
 
         return self
 
-    # Set & get attribute
-    def set(self, attribute: str, value: str|True = True):
+    # Set attribute with optional value
+    def set(self, attribute: str, value: Any = True):
         self.attributes[attribute] = value
         return self
 
-    def get(self, attribute: str) -> str|True|None:
+    # Get attribute value by it's name
+    def get(self, attribute: str) -> Any|None:
         if attribute in self.attributes:
             return self.attributes[attribute]
         return None
 
-    # Set & get classes
+    # Unset attribute by it's name
+    def unset(self, attribute: str):
+        if attribute in self.attributes:
+            del self.attributes[attribute]
+
+    # Set class list
     def set_classes(self, *class_names: str):
         self.classes = list(class_names)
         return self
 
+    # Add class to class list
     def add_class(self, class_name: str):
         if class_name not in self.classes:
             self.classes.append(class_name)
         return self
 
-    def remove_class(self, class_name: str):
+    # Unset class from class list
+    def unset_class(self, class_name: str):
         if class_name in self.classes:
             self.classes.remove(class_name)
         return self
 
-    # Set & get id attribute
+    # Set 'id' attribute
     def set_id(self, id: str):
         self.set("id", id)
         return self
 
+    # Get value of 'id' attribute
     def get_id(self) -> str|None:
         return self.get("id")
 
-    # Set & get name attribute
+    # Set 'name' attribute
     def set_name(self, name: str):
         self.set("name", name)
         return self
 
+    # Get value of 'name' attribute
     def get_name(self) -> str|None:
         return self.get("name")
 
-    # Set & get value attribute
-    def set_value(self, value: str):
+    # Set 'value' attribute
+    def set_value(self, value: Any):
         self.set("value", value)
         return self
 
-    def get_value(self) -> str|None:
+    # Get value of 'value' attribute
+    def get_value(self) -> Any|None:
         return self.get("value")
 
-    # Set & get style
+    # Set style property and it's value
     def set_style(self, property: str, value: str):
         self.styles[property] = value
         return self
 
+    # Get style by it's property name
     def get_style(self, property: str) -> str|None:
         if property in self.styles:
             return self.styles[property]
@@ -164,11 +176,11 @@ class Tag:
         return self.find_all(lambda tag: all(item in tag.classes for item in class_name))
 
     # Find tag by attribute value
-    def find_by_attribute(self, attribute: str, value: str|True = True):
+    def find_by_attribute(self, attribute: str, value: Any = True):
         return self.find(lambda tag: tag.get(attribute) == value if value != True else tag.get(attribute) != None)
 
     # Find tags by attribute value
-    def find_all_by_attribute(self, attribute: str, value: str|True = True):
+    def find_all_by_attribute(self, attribute: str, value: Any = True):
         return self.find_all(lambda tag: tag.get(attribute) == value if value != True else tag.get(attribute) != None)
 
     # Escape HTML code if escape option is set
@@ -198,13 +210,13 @@ class Tag:
         if self.before != None:
             if pretty and depth > 0:
                 result.append("\n" + self.__indent(depth))
-            result.append(self.before)
+            result.append(str(self.before))
 
         # Check if this element is a text element
         if self.is_text:
             #if pretty and depth > 0:
             #    result.append("\n" + self.__indent(depth))
-            result.append(self.__escape(self.text))
+            result.append(self.__escape(str(self.text)))
         else:
             # Add opening tag
             if pretty and depth > 0:
@@ -229,7 +241,7 @@ class Tag:
                 if value == True:
                     temp.append(self.__escape(key))
                 else:
-                    temp.append(f"{self.__escape(key)}=\"{self.__escape(value, force=True)}\"")
+                    temp.append(f"{self.__escape(key)}=\"{self.__escape(str(value), force=True)}\"")
             result.append(" ".join(temp))
 
             # Add child tags
@@ -250,7 +262,7 @@ class Tag:
 
         # Add after element
         if self.after != None:
-            result.append(self.after)
+            result.append(str(self.after))
 
         return "".join(result)
 
@@ -261,12 +273,11 @@ class Tag:
 
 # Text element
 class Text(Tag):
-    def __init__(self, text: str):
+    def __init__(self, text: Any):
         super().__init__(None)
-        self.is_text = True
-        self.text = text
+        self.set_text(text)
 
     def __str__(self):
-        return self.text
+        return str(self.text)
     def __repr__(self):
         return self.__str__()
