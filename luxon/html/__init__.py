@@ -9,7 +9,7 @@ class Tag:
         self.attributes: dict[str, Any] = {}
         self.classes: list[str] = []
         self.styles: dict[str, str] = {}
-        self.tags: list[Tag] = []
+        self.__tags: list[Tag] = []
         self.text: Any = None
         self.before: Any = None
         self.after: Any = None
@@ -31,31 +31,31 @@ class Tag:
     def add(self, *tags: Tag|list[Tag|str]|str):
         for tag in tags:
             if type(tag) == str:
-                self.tags.append(Text(tag))
+                self.__tags.append(Text(tag))
             elif type(tag) == list:
                 self.add(*tag)
             else:
-                self.tags.append(tag)
+                self.__tags.append(tag)
 
         return self
 
     # Remove a child tag
     def remove(self, tag: Tag):
-        if tag in self.tags:
-            self.tags.remove(tag)
+        if tag in self.__tags:
+            self.__tags.remove(tag)
         return self
 
     # Remove all children tags
     def remove_all(self):
-        self.tags.clear()
+        self.__tags.clear()
         return self
 
     # Remove all children tags where lambda expression is true
     def remove_where(self, func: Callable[[Tag], bool]):
         i = 0
-        while i < len(self.tags):
-            if func(self.tags[i]):
-                del self.tags[i]
+        while i < len(self.__tags):
+            if func(self.__tags[i]):
+                del self.__tags[i]
                 i -= 1
             i += 1
         return self
@@ -135,7 +135,7 @@ class Tag:
     def find(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> Tag|None:
         if max_depth != None: max_depth -= 1
 
-        for tag in self.tags:
+        for tag in self.__tags:
             if type(tag) != Text:
                 if func(tag): return tag
                 if recurse and (max_depth == None or max_depth > -1): 
@@ -271,13 +271,13 @@ class Tag:
                 result += ">"
                 
                 new_depth = depth + 1
-                for tag in self.tags:
+                for tag in self.__tags:
                     if type(tag) == Text: 
                         has_text = True
                     result += tag.html(pretty, new_depth)
 
             # Add closing tag
-            if not self.nobody and not has_text and len(self.tags) != 0 and pretty:
+            if not self.nobody and not has_text and len(self.__tags) != 0 and pretty:
                 result += "\n" + self.__indent(depth)
             result += " />" if self.nobody else f"</{self.name}>"
 
@@ -289,13 +289,13 @@ class Tag:
 
     # Overload slice/array access operator
     def __getitem__(self, slice: slice) -> Tag|list[Tag]:
-        return self.tags[slice]
+        return self.__tags[slice]
 
     def __setitem__(self, slice: slice, tag: Tag):
-        self.tags[slice] = tag
+        self.__tags[slice] = tag
 
     def __delitem__(self, slice: slice):  
-        del self.tags[slice]
+        del self.__tags[slice]
 
 
     def __str__(self):
