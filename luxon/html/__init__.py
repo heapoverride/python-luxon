@@ -54,6 +54,7 @@ class Tag:
     def insert(self, index: int, *tags: Tag|list[Tag|str]|str):
         for tag in tags[::-1]:
             self.__tags.insert(index, tag)
+        return self
 
     # Remove all children tags where lambda expression is true
     def remove_where(self, func: Callable[[Tag], bool]):
