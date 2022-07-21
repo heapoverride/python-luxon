@@ -518,7 +518,6 @@ class Picture(Tag):
         self.add(Img(source, alt))
         return self
 
-
 """
 Used to embed audio content in HTML document
 """
