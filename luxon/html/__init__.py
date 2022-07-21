@@ -164,11 +164,11 @@ class Tag:
 
     # Find tag by attribute value
     def find_by_attribute(self, attribute: str, value: str|True = True):
-        return self.find(lambda tag: tag.get(attribute) == value)
+        return self.find(lambda tag: tag.get(attribute) == value if value != True else tag.get(attribute) != None)
 
     # Find tags by attribute value
     def find_all_by_attribute(self, attribute: str, value: str|True = True):
-        return self.find_all(lambda tag: tag.get(attribute) == value)
+        return self.find_all(lambda tag: tag.get(attribute) == value if value != True else tag.get(attribute) != None)
 
     # Escape HTML code if escape option is set
     def __escape(self, input: str, force: bool = False) -> str:
