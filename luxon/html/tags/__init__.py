@@ -314,6 +314,7 @@ class Fieldset(Tag):
 
     def add_legend(self, *content: str|Tag):
         self.add(Legend(*content))
+        return self
 
 """
 Defines a caption for content of Fieldset
