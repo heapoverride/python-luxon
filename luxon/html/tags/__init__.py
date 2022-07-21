@@ -491,11 +491,17 @@ class Td(Tag):
 Defines multiple media recourses for different media element such as Picture, Video, and Audio
 """
 class Source(Tag):
-    def __init__(self, source: str, type: str):
+    def __init__(self, source: str|list[str], mime_type: str = None, media_query: str = None):
         super().__init__("source")
-        self.set("src", source)
-        self.set("type", type)
         self.nobody = True
+
+        if type(source) == str:
+            self.set("src", source)
+        elif type(source) == list[str]:
+            self.set("srcset", ",".join(source))
+
+        if mime_type: self.set("type", mime_type)
+        if media_query: self.set("media", media_query)
 
 """
 Defines more than one source elements and one image element
@@ -503,6 +509,14 @@ Defines more than one source elements and one image element
 class Picture(Tag):
     def __init__(self):
         super().__init__("picture")
+
+    def add_source(self, sources: list[str], media_query: str):
+        self.add(Source(sources, media_query=media_query))
+        return self
+
+    def add_image(self, source: str, alt: str = None):
+        self.add(Img(source, alt))
+
 
 """
 Used to embed audio content in HTML document
@@ -516,6 +530,10 @@ class Audio(Tag):
         if loop: self.set("loop", True)
         if muted: self.set("muted", True)
         if preload: self.set("preload", preload)
+
+    def add_source(self, source: str, type: str):
+        self.add(Source(source, type))
+        return self
 
 """
 Used to embed a video content with an HTML document
@@ -532,6 +550,10 @@ class Video(Tag):
         if loop: self.set("loop", True)
         if muted: self.set("muted", True)
         if preload: self.set("preload", preload)
+
+    def add_source(self, source: str, type: str):
+        self.add(Source(source, type))
+        return self
 
 """
 Heading 1
@@ -592,8 +614,9 @@ class Track(Tag):
 Used to make text font one size smaller than document's base font size
 """
 class Small(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("small")
+        self.add(*content)
 
 """
 Defines preformatted text in an HTML document
@@ -607,50 +630,57 @@ class Pre(Tag):
 Represents a paragraph in an HTML document
 """
 class P(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("p")
+        self.add(*content)
 
 """
 Provides an alternative content if a script type is not supported in browser
 """
 class Noscript(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("noscript")
+        self.add(*content)
 
 """
 Used to define important text
 """
 class Strong(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("strong")
+        self.add(*content)
 
 """
 Used to represent a text in some different voice
 """
 class I(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("i")
+        self.add(*content)
 
 """
 Used to render enclosed text with an underline
 """
 class U(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("u")
+        self.add(*content)
 
 """
 Used to make a text bold
 """
 class B(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("b")
+        self.add(*content)
 
 """
 Used to emphasis the content applied within this element
 """
 class Em(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("em")
+        self.add(*content)
 
 """
 Defines a text label for Input of Form
@@ -665,15 +695,17 @@ class Label(Tag):
 Defines a text which displays as a subscript text
 """
 class Sub(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("sub")
+        self.add(*content)
 
 """
 Defines a text which displays as a superscript text
 """
 class Sup(Tag):
-    def __init__(self):
+    def __init__(self, *content: str|Tag):
         super().__init__("sup")
+        self.add(*content)
 
 """
 Defines ordered list of items
@@ -682,6 +714,9 @@ class Ol(Tag):
     def __init__(self):
         super().__init__("ol")
 
+    def add_item(self, *content: str|Tag):
+        self.add(Li(*content))
+
 """
 Defines unordered list of items
 """
@@ -689,11 +724,14 @@ class Ul(Tag):
     def __init__(self):
         super().__init__("ul")
 
+    def add_item(self, *content: str|Tag):
+        self.add(Li(*content))
+
 """
 Used to represent items in list
 """
 class Li(Tag):
-    def __init__(self, *content: Tag|str):
+    def __init__(self, *content: str|Tag):
         super().__init__("li")
         self.add(*content)
 
