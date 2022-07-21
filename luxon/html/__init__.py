@@ -53,7 +53,12 @@ class Tag:
     # Insert tags at index
     def insert(self, index: int, *tags: Tag|list[Tag|str]|str):
         for tag in tags[::-1]:
-            self.__tags.insert(index, tag)
+            if type(tag) == str:
+                self.__tags.insert(index, Text(tag))
+            elif type(tag) == list:
+                self.insert(index, *tag)
+            else:
+                self.__tags.insert(index, tag)
         return self
 
     # Remove all children tags where lambda expression is true
@@ -228,9 +233,8 @@ class Tag:
     def call(self, func: Callable[[Tag], None]):
         func(self)
         return self
-
-    # Produce HTML source code
-    def html(self, pretty: bool = False, depth: int = 0) -> str:
+        
+    def __html(self, pretty: bool = False, depth: int = 0, extend: bool = True) -> str:
         result: str = ""
 
         # Add before element
@@ -241,8 +245,8 @@ class Tag:
 
         # Check if this element is a text element
         if self.is_text:
-            #if pretty and depth > 0:
-            #    result += "\n" + self.__indent(depth)
+            if pretty and depth > 0 and extend:
+                result += "\n" + self.__indent(depth)
             result += self.__escape(str(self.text))
         else:
             # Add opening tag
@@ -272,18 +276,18 @@ class Tag:
             result += " ".join(temp)
 
             # Add child tags
-            has_text = False
+            text_only = True
             if not self.nobody:
                 result += ">"
                 
                 new_depth = depth + 1
                 for tag in self.__tags:
-                    if type(tag) == Text: 
-                        has_text = True
-                    result += tag.html(pretty, new_depth)
+                    if type(tag) != Text: 
+                        text_only = False
+                    result += tag.__html(pretty, depth=new_depth, extend=not text_only)
 
             # Add closing tag
-            if not self.nobody and not has_text and len(self.__tags) != 0 and pretty:
+            if not self.nobody and not text_only and len(self.__tags) != 0 and pretty:
                 result += "\n" + self.__indent(depth)
             result += " />" if self.nobody else f"</{self.name}>"
 
@@ -292,6 +296,10 @@ class Tag:
             result += str(self.after)
 
         return result
+
+    # Produce HTML source code
+    def html(self, pretty: bool = False):
+        return self.__html(pretty, depth=0)
 
     # Overload slice/array access operator
     def __getitem__(self, slice: slice) -> Tag|list[Tag]:
