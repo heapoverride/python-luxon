@@ -106,7 +106,7 @@ class Tag:
             if type(tag) != Text:
                 if func(tag): return tag
                 if recurse and (max_depth == None or max_depth > -1): 
-                    _tag = tag.find_one(func, recurse=recurse, max_depth=max_depth)
+                    _tag = tag.find(func, recurse=recurse, max_depth=max_depth)
                     if _tag != None: return _tag
         return None
 
