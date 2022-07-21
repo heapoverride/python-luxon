@@ -716,6 +716,7 @@ class Ol(Tag):
 
     def add_item(self, *content: str|Tag):
         self.add(Li(*content))
+        return self
 
 """
 Defines unordered list of items
@@ -726,6 +727,7 @@ class Ul(Tag):
 
     def add_item(self, *content: str|Tag):
         self.add(Li(*content))
+        return self
 
 """
 Used to represent items in list
