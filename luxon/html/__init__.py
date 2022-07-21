@@ -58,6 +58,7 @@ class Tag:
                 del self.tags[i]
                 i -= 1
             i += 1
+        return self
 
     # Set attribute with optional value
     def set(self, attribute: str, value: Any = True):
