@@ -364,7 +364,6 @@ class Tag:
         self.add(tag)
         return self
 
-
     def __str__(self):
         return self.html()
     def __repr__(self): 
