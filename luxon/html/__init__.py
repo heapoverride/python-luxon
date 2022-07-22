@@ -175,7 +175,7 @@ class Tag:
     def __find_all(tag: Tag, func: Callable[[Tag], bool], result: list[Tag], recurse: bool = True, max_depth: int = None):
         if max_depth != None: max_depth -= 1
         
-        for _tag in tag.tags:
+        for _tag in tag.__tags:
             if type(_tag) != Text:
                 if func(_tag): result.append(_tag)
                 if recurse and (max_depth == None or max_depth > -1): 
