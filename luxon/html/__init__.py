@@ -347,6 +347,10 @@ class Tag:
     def __delitem__(self, slice: slice):  
         del self.__tags[slice]
 
+    # Overload binary operators
+    def __add__(self, tag: Tag|list[Tag|str]|str):
+        self.add(tag)
+
 
     def __str__(self):
         return self.html()
