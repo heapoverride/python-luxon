@@ -16,6 +16,7 @@ class Tag:
         self.escape: bool = True
         self.nobody: bool = False
         self.is_text: bool = False
+        self.hidden: bool = False
         self.parent: Tag = None
 
     # Indent a line of HTML source code
@@ -269,9 +270,20 @@ class Tag:
     def call(self, func: Callable[[Tag], None]):
         func(self)
         return self
+
+    # This method is called before HTML 
+    # source code is generated and can be overloaded
+    def update(self):
+        pass
         
     def __html(self, pretty: bool = False, depth: int = 0, extend: bool = True) -> str:
         result: str = ""
+
+        # Return now if element is hidden
+        if self.hidden: return result
+
+        # Call update
+        self.update()
 
         # Add before element
         if self.before != None:
