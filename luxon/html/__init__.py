@@ -28,7 +28,7 @@ class Tag:
         self.text = text
         return self
 
-    # Add children tags to this tag
+    # Add child elements
     def add(self, *tags: Tag|list[Tag|str]|str):
         for tag in tags:
             if type(tag) == str:
@@ -39,6 +39,12 @@ class Tag:
                 tag.parent = self
                 self.__tags.append(tag)
 
+        return self
+
+    # Set child elements
+    def set_body(self, *tags: Tag|list[Tag|str]|str):
+        self.remove_all()
+        self.add(*tags)
         return self
 
     # Remove a child tag
