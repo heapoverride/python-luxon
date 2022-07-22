@@ -726,8 +726,9 @@ class Sup(Tag):
 Defines ordered list of items
 """
 class Ol(Tag):
-    def __init__(self):
+    def __init__(self, *items: str|Tag):
         super().__init__("ol")
+        self.add(*[Li(x) for x in items])
 
     def add_item(self, *content: str|Tag):
         self.add(Li(*content))
@@ -737,9 +738,9 @@ class Ol(Tag):
 Defines unordered list of items
 """
 class Ul(Tag):
-    def __init__(self):
+    def __init__(self, *items: str|Tag):
         super().__init__("ul")
-
+        self.add(*[Li(x) for x in items])
     def add_item(self, *content: str|Tag):
         self.add(Li(*content))
         return self
