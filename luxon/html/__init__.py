@@ -5,10 +5,10 @@ from typing import Callable
 # Base class for all HTML tags
 class Tag:
     def __init__(self, name: str):
-        self.name: str = name
-        self.attributes: dict[str, Any] = {}
-        self.classes: list[str] = []
-        self.styles: dict[str, str] = {}
+        self.__name: str = name
+        self.__attributes: dict[str, Any] = {}
+        self.__classes: list[str] = []
+        self.__styles: dict[str, str] = {}
         self.__tags: list[Tag] = []
         self.text: Any = None
         self.before: Any = None
@@ -75,35 +75,35 @@ class Tag:
 
     # Set attribute with optional value
     def set(self, attribute: str, value: Any = True):
-        self.attributes[attribute] = value
+        self.__attributes[attribute] = value
         return self
 
     # Get attribute value by it's name
     def get(self, attribute: str) -> Any|None:
-        if attribute in self.attributes:
-            return self.attributes[attribute]
+        if attribute in self.__attributes:
+            return self.__attributes[attribute]
         return None
 
     # Unset attribute by it's name
     def unset(self, attribute: str):
-        if attribute in self.attributes:
-            del self.attributes[attribute]
+        if attribute in self.__attributes:
+            del self.__attributes[attribute]
 
     # Set class list
     def set_classes(self, *class_names: str):
-        self.classes = list(class_names)
+        self.__classes = list(class_names)
         return self
 
     # Add class to class list
     def add_class(self, class_name: str):
-        if class_name not in self.classes:
-            self.classes.append(class_name)
+        if class_name not in self.__classes:
+            self.__classes.append(class_name)
         return self
 
     # Unset class from class list
     def unset_class(self, class_name: str):
-        if class_name in self.classes:
-            self.classes.remove(class_name)
+        if class_name in self.__classes:
+            self.__classes.remove(class_name)
         return self
 
     # Set 'id' attribute
@@ -135,13 +135,13 @@ class Tag:
 
     # Set style property and it's value
     def set_style(self, property: str, value: str):
-        self.styles[property] = value
+        self.__styles[property] = value
         return self
 
     # Get style by it's property name
     def get_style(self, property: str) -> str|None:
-        if property in self.styles:
-            return self.styles[property]
+        if property in self.__styles:
+            return self.__styles[property]
         return None
 
     # Find a single tag
@@ -274,23 +274,23 @@ class Tag:
             # Add opening tag
             if pretty and depth > 0:
                 result += "\n" + self.__indent(depth)
-            has_props = len(self.attributes) + len(self.classes) + len(self.styles) > 0
-            result += f"<{self.name}" + (" " if has_props else "")
+            has_props = len(self.__attributes) + len(self.__classes) + len(self.__styles) > 0
+            result += f"<{self.__name}" + (" " if has_props else "")
 
             # Add attributes & styles
-            attributes = self.attributes
+            attributes = self.__attributes
 
-            if len(self.classes) > 0:
-                attributes["class"] = " ".join(self.__escape(x, force=True) for x in self.classes)
+            if len(self.__classes) > 0:
+                attributes["class"] = " ".join(self.__escape(x, force=True) for x in self.__classes)
 
-            if len(self.styles) > 0:
+            if len(self.__styles) > 0:
                 styles = []
-                for key, value in self.styles.items():
+                for key, value in self.__styles.items():
                     styles.append(f"{self.__escape(key, force=True)}: {self.__escape(value, force=True)}")
                 attributes["style"] = "; ".join(styles)
 
             temp = []
-            for key, value in self.attributes.items():
+            for key, value in self.__attributes.items():
                 if value == True:
                     temp.append(self.__escape(key))
                 else:
@@ -311,7 +311,7 @@ class Tag:
             # Add closing tag
             if not self.nobody and not text_only and len(self.__tags) != 0 and pretty:
                 result += "\n" + self.__indent(depth)
-            result += " />" if self.nobody else f"</{self.name}>"
+            result += " />" if self.nobody else f"</{self.__name}>"
 
         # Add after element
         if self.after != None:
