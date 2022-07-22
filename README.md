@@ -23,8 +23,30 @@ def main():
         )
     )
 
-    #print(doc)
     print(doc.html(pretty=True))
+
+if __name__ == "__main__":
+    main()
+```
+```py
+from luxon.html.tags import *
+
+def main():
+    # Yes, you can even do this but
+    # it doesn't mean you should...
+    ul = Ul() \
+        + (Li("Finland") \
+            + (Ul() \
+                + Li("Helsinki") \
+                + Li("Tampere") \
+                + Li("Hämeenlinna"))) \
+        + (Li("Estonia") \
+            + (Ul() \
+                + Li("Tallinn") \
+                + Li("Tartu") \
+                + Li("Narva")))
+
+    print(ul.html(pretty=True))
 
 if __name__ == "__main__":
     main()
