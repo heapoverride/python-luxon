@@ -84,10 +84,12 @@ class Tag:
             return self.__attributes[attribute]
         return None
 
-    # Unset attribute by it's name
-    def unset(self, attribute: str):
-        if attribute in self.__attributes:
-            del self.__attributes[attribute]
+    # Unset attribute by name
+    def unset(self, *attributes: str):
+        for attribute in attributes:
+            if attribute in self.__attributes:
+                del self.__attributes[attribute]
+        return self
 
     # Set class list
     def set_classes(self, *class_names: str):
@@ -112,7 +114,7 @@ class Tag:
         return self
 
     # Get value of 'id' attribute
-    def get_id(self) -> str|None:
+    def get_id(self):
         return self.get("id")
 
     # Set 'name' attribute
@@ -121,7 +123,7 @@ class Tag:
         return self
 
     # Get value of 'name' attribute
-    def get_name(self) -> str|None:
+    def get_name(self):
         return self.get("name")
 
     # Set 'value' attribute
@@ -130,7 +132,7 @@ class Tag:
         return self
 
     # Get value of 'value' attribute
-    def get_value(self) -> Any|None:
+    def get_value(self):
         return self.get("value")
 
     # Set style property and it's value
@@ -143,6 +145,12 @@ class Tag:
         if property in self.__styles:
             return self.__styles[property]
         return None
+
+    # Unset style property
+    def unset_style(self, property: str):
+        if property in self.__styles:
+            del self.__styles[property]
+        return self
 
     # Find a single tag
     def find(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> Tag|None:
