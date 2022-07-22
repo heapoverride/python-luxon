@@ -382,14 +382,18 @@ class Select(Tag):
         if id: self.set_id(id)
         if name: self.set_name(name)
 
+    def add_option(self, text: str, value: str = None, disabled: bool = False):
+        self.add(Option(text, value, disabled=disabled))
+
 """
 Used to define options or items in a drop-down list (Select)
 """
 class Option(Tag):
-    def __init__(self, text: str, value: str = None):
+    def __init__(self, text: str, value: str = None, disabled: bool = False):
         super().__init__("option")
         self.add(text)
         if value: self.set_value(value)
+        if disabled: self.set("disabled")
 
 """
 Defines an inline frame which can embed other content
