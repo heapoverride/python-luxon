@@ -91,3 +91,25 @@ class Document(Html):
         self.footer = Footer()
         self.body.add(self.footer)
 ```
+```py
+from luxon.html.tags import *
+
+def main():
+    ul = Ul().add(
+        Li("Finland").add(
+            Ul("Helsinki", "Tampere", "Hämeenlinna")),
+        Li("Estonia").add(
+            Ul("Tallinn", "Tartu","Narva")))
+
+    print(ul.html(pretty=True))
+    
+    tags = ul.find_all(
+        lambda t: type(t.parent) == Ul 
+            and t.parent[0] == t 
+            and type(t.parent.parent) == Li)
+            
+    print(tags)
+
+if __name__ == "__main__":
+    main()
+```
