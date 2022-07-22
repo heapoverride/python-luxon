@@ -7,25 +7,22 @@ This repository contains some parts of my Luxon framework (PHP) implemented usin
 from luxon.html.tags import *
 
 def main():
-    fruits = Ul()
-
-    html = Html().add(
+    doc = Html().add(
         Head().add(
-            Title(text)
+            Title("Example site")
         ),
         Body().add(
             Header(),
             Main().add(
                 Img("/assets/catgirl.png"),
-                fruits
+                Ul("Apple", "Mango", "Lime", "Banana")
             ),
             Footer()
         )
     )
 
-    fruits.add([Li(x) for x in ["Apple", "Mango", "Lime", "Banana"]])
-
-    print(html)
+    #print(doc)
+    print(doc.html(pretty=True))
 
 if __name__ == "__main__":
     main()
