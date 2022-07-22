@@ -362,6 +362,7 @@ class Tag:
     # Overload binary operators
     def __add__(self, tag: Tag|list[Tag|str]|str):
         self.add(tag)
+        return self
 
 
     def __str__(self):
