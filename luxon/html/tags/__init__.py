@@ -384,6 +384,7 @@ class Select(Tag):
 
     def add_option(self, text: str, value: str = None, disabled: bool = False):
         self.add(Option(text, value, disabled=disabled))
+        return self
 
 """
 Used to define options or items in a drop-down list (Select)
