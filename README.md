@@ -9,12 +9,14 @@ from luxon.html.tags import *
 def main():
     doc = Html().add(
         Head().add(
-            Title("Example site")
+            Title("Example site"),
+            # Style defined this way shows up as <link> tag in source code
+            Style("/assets/styles/base.css")
         ),
         Body().add(
             Header(),
             Main().add(
-                Img("/assets/catgirl.png"),
+                Img("/assets/images/catgirl.png"),
                 Ul("Apple", "Mango", "Lime", "Banana")
             ),
             Footer()
