@@ -16,6 +16,7 @@ class Tag:
         self.escape: bool = True
         self.nobody: bool = False
         self.is_text: bool = False
+        self.parent: Tag = None
 
     # Indent a line of HTML source code
     def __indent(self, depth: int) -> str:
@@ -31,10 +32,11 @@ class Tag:
     def add(self, *tags: Tag|list[Tag|str]|str):
         for tag in tags:
             if type(tag) == str:
-                self.__tags.append(Text(tag))
+                self.add(Text(tag))
             elif type(tag) == list:
                 self.add(*tag)
             else:
+                tag.parent = self
                 self.__tags.append(tag)
 
         return self
