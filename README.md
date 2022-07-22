@@ -2,7 +2,7 @@
 This repository contains some parts of my Luxon framework (PHP) implemented using Python.
 
 ### Code examples
-#### HTML generator
+#### HTML source code generator
 ```py
 from luxon.html.tags import *
 
