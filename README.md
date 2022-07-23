@@ -99,7 +99,7 @@ def main():
         Li("Finland").add(
             Ul("Helsinki", "Tampere", "Hämeenlinna")),
         Li("Estonia").add(
-            Ul("Tallinn", "Tartu","Narva")))
+            Ul("Tallinn", "Tartu", "Narva")))
 
     print(ul.html(pretty=True))
     
