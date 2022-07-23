@@ -359,11 +359,17 @@ class Tag:
     def __delitem__(self, slice: slice):  
         del self.__tags[slice]
 
+    # Use len() to get the length of child tags
+    def __len__(self):
+        return len(self.__tags)
+
     # Overload binary operators
     def __add__(self, tag: Tag|list[Tag|str]|str):
         self.add(tag)
         return self
 
+    # Generate this tag's HTML source code (minified)
+    # when this tag is printed or converted to string using str()
     def __str__(self):
         return self.html()
     def __repr__(self): 
