@@ -768,12 +768,12 @@ class Video(Tag):
 
         Args:
             source (str, optional): Specifies the URL of the video file. Defaults to None.
-            width (int, optional): 	Sets the width of the video player. Defaults to None.
+            width (int, optional): Sets the width of the video player. Defaults to None.
             height (int, optional): Sets the height of the video player. Defaults to None.
             poster (str, optional): Specifies an image to be shown while the video is downloading, or until the user hits the play button. Defaults to None.
             autoplay (bool, optional): Specifies that the video will start playing as soon as it is ready. Defaults to False.
-            controls (bool, optional): 	Specifies that video controls should be displayed. Defaults to False.
-            loop (bool, optional): 	Specifies that the video will start over again, every time it is finished. Defaults to False.
+            controls (bool, optional): Specifies that video controls should be displayed. Defaults to False.
+            loop (bool, optional): Specifies that the video will start over again, every time it is finished. Defaults to False.
             muted (bool, optional): Specifies that the audio output of the video should be muted. Defaults to False.
             preload (str, optional): Specifies if and how the author thinks the video should be loaded when the page loads. Defaults to None.
         """
