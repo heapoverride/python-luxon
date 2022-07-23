@@ -5,13 +5,13 @@ class Tag:
     """Base class for all HTML elements\n 
     All other elements inherit from this base class
     """
-    def __init__(self, name: str):
+    def __init__(self, tagname: str):
         """Construct a Tag element
         
         Args:
-            name (str): Tag name
+            tagname (str): Name of the HTML tag
         """
-        self.__name: str = name.lower() if type(name) == str else name
+        self.tagname: str = tagname.lower() if type(tagname) == str else tagname
         self.__attributes: dict[str, Any] = {}
         self.__classes: list[str] = []
         self.__styles: dict[str, str] = {}
@@ -390,7 +390,7 @@ class Tag:
         Returns:
             Tag|None: Found element or None if no element was found
         """
-        return self.find(lambda tag: tag.name == tagname, 
+        return self.find(lambda tag: tag.tagname == tagname, 
             recurse=recurse, 
             max_depth=max_depth)
 
@@ -405,7 +405,7 @@ class Tag:
         Returns:
             list[Tag]: List of found elements
         """
-        return self.find_all(lambda tag: tag.name == tagname, 
+        return self.find_all(lambda tag: tag.tagname == tagname, 
             recurse=recurse, 
             max_depth=max_depth)
 
