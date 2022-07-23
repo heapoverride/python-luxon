@@ -1092,6 +1092,11 @@ class Img(Tag):
 class Comment(Tag):
     """Comments are not displayed in the browsers but they're visible in the source code"""
     def __init__(self, comment: str):
+        """Construct a Comment element
+
+        Args:
+            comment (str): Comment
+        """
         super().__init__(None)
         self.set_text(comment)
         self.before = "<!-- "
