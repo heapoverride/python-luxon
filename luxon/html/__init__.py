@@ -538,7 +538,7 @@ class Tag:
             if pretty and depth > 0:
                 result += "\n" + self.__indent(depth)
             has_props = len(self.__attributes) + len(self.__classes) + len(self.__styles) > 0
-            result += f"<{self.__name}" + (" " if has_props else "")
+            result += f"<{self.tagname}" + (" " if has_props else "")
 
             # Add attributes & styles
             attributes = self.__attributes
@@ -574,7 +574,7 @@ class Tag:
             # Add closing tag
             if not self.nobody and not text_only and len(self.__tags) != 0 and pretty:
                 result += "\n" + self.__indent(depth)
-            result += " />" if self.nobody else f"</{self.__name}>"
+            result += " />" if self.nobody else f"</{self.tagname}>"
 
         # Add after element
         if self.after != None:
