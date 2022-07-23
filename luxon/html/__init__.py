@@ -502,10 +502,10 @@ class Tag:
             max_depth=max_depth)
 
     def call(self, func: Callable[[Tag], None]):
-        """Call a lambda expression or named method with this element as the first argument
+        """Call a named method with this element as the first argument
 
         Args:
-            func (Callable[[Tag], None]): Lambda expression or named method
+            func (Callable[[Tag], None]): Named method
 
         Returns:
             self
