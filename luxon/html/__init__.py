@@ -6,7 +6,7 @@ class Tag:
     All other elements inherit from this base class
     """
     def __init__(self, name: str):
-        """Construct a HTML tag
+        """Construct a Tag element
         
         Args:
             name (str): Tag name
@@ -644,7 +644,7 @@ class Tag:
 class Text(Tag):
     """Text element"""
     def __init__(self, text: Any):
-        """Construct a text element
+        """Construct a Text element
 
         Args:
             text (Any): String value or other type that can be converted to string
