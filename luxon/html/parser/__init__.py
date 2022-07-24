@@ -291,4 +291,4 @@ class Parser:
         Returns:
             Tag|list[Tag]: Tag or list of tags
         """
-        return Parser.__parse(html)
+        return Parser.__parse(str(html))
