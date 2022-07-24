@@ -126,6 +126,7 @@ class Parser:
             if state == Parser.State.TEXT:
                 if html[pos] == "<":
                     # Opening tag
+                    temp = temp.strip()
                     if temp != "":
                         # Add text element
                         tags.append(Text(temp))
@@ -272,6 +273,7 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
+        temp = temp.strip()
         if temp != "":
             tags.append(Text(temp))
 

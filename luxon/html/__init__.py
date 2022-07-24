@@ -527,14 +527,16 @@ class Tag:
         self.update()
 
         # Add before element
+        indented_before = False
         if self.before != None:
             if pretty and depth > 0:
                 result += "\n" + self.__indent(depth)
+                indented_before = True
             result += str(self.before)
 
         # Check if this element is a text element
         if self.is_text:
-            if pretty and depth > 0 and extend:
+            if pretty and depth > 0 and extend and not indented_before:
                 result += "\n" + self.__indent(depth)
             result += self.__escape(str(self.text))
         else:
@@ -557,7 +559,7 @@ class Tag:
                 attributes["style"] = "; ".join(styles)
 
             temp = []
-            for key, value in self.__attributes.items():
+            for key, value in attributes.items():
                 if value == True:
                     temp.append(self.__escape(key))
                 else:
@@ -569,7 +571,7 @@ class Tag:
             if not self.nobody:
                 result += ">"
                 
-                new_depth = depth + 1
+                new_depth = depth+1
                 for tag in self.__tags:
                     if type(tag) != Text: 
                         text_only = False
