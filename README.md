@@ -2,6 +2,20 @@
 This repository contains some parts of my Luxon framework (PHP) implemented using Python.
 
 ### Code examples
+#### HTML source code parser
+```py
+from luxon.html.parser import Parser
+
+def main():
+    item = Parser.parse("<h1>Hello world!</h1>")
+    print(item)
+
+    items = Parser.parse("<h1>Hello</h1><h2>world!</h2>")
+    print(items)
+
+if __name__ == "__main__":
+    main()
+```
 #### HTML source code generator
 ```py
 from luxon.html.tags import *
