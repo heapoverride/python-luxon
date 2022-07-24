@@ -597,7 +597,8 @@ class Tag:
         """
         return self.__html(pretty, depth=0)
 
-    def __indent(self, depth: int) -> str:
+    @staticmethod
+    def __indent(depth: int) -> str:
         return "    " * depth
 
     def __escape(self, input: str, force: bool = False) -> str:
