@@ -512,6 +512,12 @@ class Tag:
         """
         func(self)
         return self
+
+    def update(self):
+        """Called right before this element's source code is generated.\n 
+        Can be overloaded and used to update this element, it's children or parent elements.
+        """
+        pass
         
     def __html(self, pretty: bool = False, depth: int = 0, extend: bool = True) -> str:
         result: str = ""
@@ -608,11 +614,6 @@ class Tag:
                 input = input.replace(old, new)
 
         return input
-
-    # This method is called before HTML 
-    # source code is generated and can be overloaded
-    def update(self):
-        pass
 
     # Overload slice/array access operator
     def __getitem__(self, slice: slice) -> Tag|list[Tag]:
