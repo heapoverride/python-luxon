@@ -69,7 +69,7 @@ class Parser:
 
     @staticmethod
     def __get_known_type(tagname: str) -> type:
-        """Construct a HTML element from tag name
+        """Return a known type from tag name
 
         Args:
             tagname (str): Tag name
@@ -162,6 +162,27 @@ class Parser:
 
         return Tag(tagname)
 
+    @staticmethod
+    def __create_tag(tagname: str):
+        """Create an instance of known tag
+
+        Args:
+            tagname (str): Tag name
+
+        Returns:
+            Tag
+        """
+        known_type = Parser.__get_known_type(tagname)
+
+        match tagname:
+            case "html":
+                return Html()
+
+        tag = Tag(tagname)
+        tag.__class__ = known_type
+        return tag
+        
+
     class State(IntEnum):
         TEXT = 0
         DOCTYPE = 1
@@ -245,8 +266,7 @@ class Parser:
                 if html[pos] in (" ", ">"):
                     # End of tag name
                     if temp != "":
-                        tag = Tag(temp)
-                        tag.__class__ = Parser.__get_known_type(tag.tagname)
+                        tag = Parser.__create_tag(temp)
                         tags.append(tag)
                         temp = ""
 
@@ -260,8 +280,7 @@ class Parser:
                 elif html[pos] == "/" and pos < end-1 and html[pos+1] == ">":
                     # End of tag
                     if temp != "":
-                        tag = Tag(temp)
-                        tag.__class__ = Parser.__get_known_type(tag.tagname)
+                        tag = Parser.__create_tag(temp)
                         tags.append(tag)
                         temp = ""
 
