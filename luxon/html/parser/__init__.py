@@ -68,17 +68,97 @@ class Parser:
         return -1
 
     @staticmethod
-    def __create_tag(tagname: str):
+    def __get_known_type(tagname: str) -> type:
         """Construct a HTML element from tag name
 
         Args:
             tagname (str): Tag name
 
         Returns:
-            Tag
+            type
         """
         match tagname.lower():
-            case "i": return I()
+            case "html": return Html
+            case "head": return Head
+            case "title": return Title
+            case "meta": return Meta
+            case "style": return Style
+            case "link": return Link
+            case "body": return Body
+            case "header": return Header
+            case "main": return Main
+            case "footer": return Footer
+            case "span": return Span
+            case "div": return Div
+            case "article": return Article
+            case "aside": return Aside
+            case "details": return Details
+            case "figcaption": return Figcaption
+            case "caption": return Caption
+            case "cite": return Cite
+            case "figure": return Figure
+            case "mark": return Mark
+            case "nav": return Nav
+            case "section": return Section
+            case "summary": return Summary
+            case "time": return Time
+            case "a": return A
+            case "area": return Area
+            case "blockquote": return Blockquote
+            case "br": return Br
+            case "hr": return Hr
+            case "button": return Button
+            case "canvas": return Canvas
+            case "code": return Code
+            case "col": return Col
+            case "colgroup": return Colgroup
+            case "data": return Data
+            case "datalist": return Datalist
+            case "dialog": return Dialog
+            case "embed": return Embed
+            case "fieldset": return Fieldset
+            case "legend": return Legend
+            case "form": return Form
+            case "input": return Input
+            case "textarea": return Textarea
+            case "script": return Script
+            case "select": return Select
+            case "option": return Option
+            case "iframe": return Iframe
+            case "table": return Table
+            case "thead": return Thead
+            case "tbody": return Tbody
+            case "tfoot": return Tfoot
+            case "tr": return Tr
+            case "th": return Th
+            case "td": return Td
+            case "source": return Source
+            case "picture": return Picture
+            case "audio": return Audio
+            case "video": return Video
+            case "h1": return H1
+            case "h2": return H2
+            case "h3": return H3
+            case "h4": return H4
+            case "h5": return H5
+            case "h6": return H6
+            case "track": return Track
+            case "small": return Small
+            case "pre": return Pre
+            case "p": return P
+            case "noscript": return Noscript
+            case "strong": return Strong
+            case "i": return I
+            case "u": return U
+            case "b": return B
+            case "em": return Em
+            case "label": return Label
+            case "sub": return Sub
+            case "sup": return Sup
+            case "ol": return Ol
+            case "ul": return Ul
+            case "li": return Li
+            case "img": return Img
 
         return Tag(tagname)
 
@@ -165,7 +245,8 @@ class Parser:
                 if html[pos] in (" ", ">"):
                     # End of tag name
                     if temp != "":
-                        tag = Parser.__create_tag(temp)
+                        tag = Tag(temp)
+                        tag.__class__ = Parser.__get_known_type(tag.tagname)
                         tags.append(tag)
                         temp = ""
 
@@ -179,7 +260,8 @@ class Parser:
                 elif html[pos] == "/" and pos < end-1 and html[pos+1] == ">":
                     # End of tag
                     if temp != "":
-                        tag = Parser.__create_tag(temp)
+                        tag = Tag(temp)
+                        tag.__class__ = Parser.__get_known_type(tag.tagname)
                         tags.append(tag)
                         temp = ""
 
