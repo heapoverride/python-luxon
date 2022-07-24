@@ -4,29 +4,33 @@ from luxon.html import *
 class Html(Tag):
     """Represents the root (top-level element) of an HTML document"""
     def __init__(self):
+        """Construct a Html element"""
         super().__init__("html")
         self.before = "<!DOCTYPE html>\n"
 
 class Head(Tag):
     """Defines the head section of an HTML document"""
     def __init__(self):
+        """Construct a Head element"""
         super().__init__("head")
 
 class Title(Tag):
     """Defines the title or name of an HTML document"""
     def __init__(self, title: str|Text = None):
+        """Construct a Title element"""
         super().__init__("title")
         if title: self.add(title)
 
 class Meta(Tag):
     """Defines the metadata of an HTML document"""
     def __init__(self):
+        """Construct a Meta element"""
         super().__init__("meta")
 
 class Style(Tag):
     """Defines the style information for an HTML document"""
     def __init__(self, source: str = None):
-        """Construct a new Style element\n
+        """Construct a Style element\n
         If source is provided, this element will produce a `<link>` tag instead of `<style>` tag
 
         Args:
@@ -191,6 +195,7 @@ class Mark(Tag):
 class Nav(Tag):
     """Represents section of page to represent navigation links"""
     def __init__(self):
+        """Construct a Nav element"""
         super().__init__("nav")
 
 class Section(Tag):
