@@ -130,3 +130,14 @@ class Selective(Div):
             Span(random.choice(["cats", "dogs"]))
         )
 ```
+```py
+from luxon.html.tags import *
+
+def main():
+    fruits = Ul("Apple", "Apricot", "Banana", "Mango")
+    del fruits[1::2]
+    print(fruits.html(pretty=True))
+
+if __name__ == "__main__":
+    main()
+```
