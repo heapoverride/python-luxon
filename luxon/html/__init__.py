@@ -306,11 +306,10 @@ class Tag:
         if max_depth != None: max_depth -= 1
 
         for tag in self.__tags:
-            if type(tag) != Text:
-                if func(tag): return tag
-                if recurse and (max_depth == None or max_depth > -1): 
-                    _tag = tag.find(func, recurse=recurse, max_depth=max_depth)
-                    if _tag != None: return _tag
+            if func(tag): return tag
+            if recurse and (max_depth == None or max_depth > -1): 
+                _tag = tag.find(func, recurse=recurse, max_depth=max_depth)
+                if _tag != None: return _tag
         return None
 
     @staticmethod
@@ -318,10 +317,9 @@ class Tag:
         if max_depth != None: max_depth -= 1
         
         for _tag in tag.__tags:
-            if type(_tag) != Text:
-                if func(_tag): result.append(_tag)
-                if recurse and (max_depth == None or max_depth > -1): 
-                    Tag.__find_all(_tag, func, result, recurse=recurse, max_depth=max_depth)
+            if func(_tag): result.append(_tag)
+            if recurse and (max_depth == None or max_depth > -1): 
+                Tag.__find_all(_tag, func, result, recurse=recurse, max_depth=max_depth)
 
     def find_all(self, func: Callable[[Tag], bool], recurse: bool = True, max_depth: int = None) -> list[Tag]:
         """Find all elements where lambda expression or named function returns `True`
