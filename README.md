@@ -113,3 +113,20 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+```py
+import random
+from luxon.html.tags import *
+
+class Selective(Div):
+    """This is a custom element that displays randomly
+    chosen content every time it's source code is generated"""
+    def __init__(self):
+        """Construct a Selective element"""
+        super().__init__()
+
+    def update(self):
+        self.set_body(
+            "I like ", 
+            Span(random.choice(["cats", "dogs"]))
+        )
+```
