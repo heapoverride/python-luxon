@@ -113,15 +113,25 @@ class Span(Tag):
 
 class Div(Tag):
     """Defines a division or section within HTML document"""
-    def __init__(self):
-        """Construct a Div element"""
+    def __init__(self, *content: str|Tag):
+        """Construct a Div element
+        
+        Args:
+            *content (str|Tag): Content
+        """
         super().__init__("div")
+        self.add(*content)
 
 class Article(Tag):
     """Defines self-contained content"""
-    def __init__(self):
-        """Construct an Article element"""
+    def __init__(self, *content: str|Tag):
+        """Construct an Article element
+        
+        Args:
+            *content (str|Tag): Content
+        """
         super().__init__("article")
+        self.add(*content)
 
 class Aside(Tag):
     """Defines content aside from main content\n 
