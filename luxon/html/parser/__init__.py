@@ -230,7 +230,9 @@ class Parser:
                     temp = temp.strip()
                     if temp != "":
                         # Add text element
-                        tags.append(Text(temp))
+                        text = Text(temp)
+                        text.escape = False
+                        tags.append(text)
                         temp = ""
                         
                     if pos < end-1 and html[pos+1] == "!":
@@ -376,7 +378,9 @@ class Parser:
         # and if we do, we add new text node
         temp = temp.strip()
         if temp != "":
-            tags.append(Text(temp))
+            text = Text(temp)
+            text.escape = False
+            tags.append(text)
 
         # Return a single tag or list of tags
         # depending on how many tags were parsed
