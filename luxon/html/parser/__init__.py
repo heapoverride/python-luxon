@@ -68,7 +68,7 @@ class Parser:
         return -1
 
     @staticmethod
-    def __get_known_type(tagname: str) -> type:
+    def __get_known_type(tagname: str) -> type|None:
         """Return a known type from tag name
 
         Args:
@@ -160,7 +160,7 @@ class Parser:
             case "li": return Li
             case "img": return Img
 
-        return Tag(tagname)
+        return None
 
     @staticmethod
     def __create_tag(tagname: str):
@@ -179,7 +179,8 @@ class Parser:
                 return Html()
 
         tag = Tag(tagname)
-        tag.__class__ = known_type
+        if known_type != None:
+            tag.__class__ = known_type
         return tag
         
 
@@ -227,8 +228,7 @@ class Parser:
             if state == Parser.State.TEXT:
                 if html[pos] == "<":
                     # Opening tag
-                    temp = temp.strip()
-                    if temp != "":
+                    if temp.strip(" \t\n\r") != "":
                         # Add text element
                         text = Text(temp)
                         text.escape = False
@@ -376,8 +376,7 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
-        temp = temp.strip()
-        if temp != "":
+        if temp.strip(" \t\n\r") != "":
             text = Text(temp)
             text.escape = False
             tags.append(text)
