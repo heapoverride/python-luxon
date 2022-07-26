@@ -2,70 +2,225 @@ from enum import IntEnum
 from luxon.html.tags import *
 
 class Parser:
-    @staticmethod
-    def __match_tags(html: str) -> list[tuple[int, int]]:
-        """Match opening (HTML) tags to their closing tags 
-        and return matches as a tuple of tuples
+    def __parse(html: str, 
+        matches: tuple[tuple[tuple[int,int],tuple[int,int]]],
+        begin: int = None, end: int = None, 
+        parent: Tag = None) -> Tag|list[Tag]:
+        """Parse HTML source code and return a tag or list of tags
 
         Args:
             html (str): HTML source code
+            begin (int, optional): Begin index
+            end (int, optional): End index
 
         Raises:
             Exception: Invalid HTML source code
 
         Returns:
-            tuple[tuple[int, int]]: Matches
+            Tag|list[Tag]: Tag or list of tags
         """
-        matches: list[tuple[int, int]] = []
-        stack = []
-        i, length = 0, len(html)
+        if not begin: begin = 0
+        if not end: end = len(html)
 
-        while i < length:
+        state: Parser.State = Parser.State.TEXT
+        opens: list[tuple[int, int]] = [] # For storing encountered open tag positions
+        closes: list[tuple[int, int]] = [] # For storing encountered close tag positions
+        stack: list[Tag] = [] # For storing data
+        tags: list[Tag] = []
+        temp: str = ""
+        tag: Tag = None
+
+        # Parser logic
+        pos = begin
+        while pos < end:
             # debug help
-            #print(f"i={i} ({repr(html[i])})   length={length}   stack={stack}   matches={matches}")
+            print(type(parent), repr(html[pos]), state, stack, opens)
 
-            if html[i] == "<" and i < length-1 and html[i+1] not in ("!", "-"):
-                if i < length-1 and html[i+1] == "/":
-                    # closing tag
-                    item = stack.pop()
-                    item[1] = i
-                    matches.append(tuple(item))
-                    i += 1
-
+            if state == Parser.State.TEXT:
+                # Handle text
+                if html[pos] == "<":
+                    # Open or close tag begins
+                    if pos < end-1 and html[pos+1] != "/":
+                        # Open tag begins
+                        opens.append((pos, -1))
+                        state = Parser.State.TAG_OPEN
+                    else:
+                        # Close tag begins
+                        closes.append((pos, -1))
+                        state = Parser.State.TAG_CLOSE
+                        pos += 1
                 else:
-                    # opening tag
-                    stack.append([i, -1])
+                    # Build text
+                    temp += html[pos]
 
-            elif html[i] == "/" and i < length-1 and html[i+1] == ">":
-                # closing tag
-                item = stack.pop()
-                #item[1] = i
-                matches.append(tuple(item))
-                i += 1
+            elif state == Parser.State.TAG_OPEN:
+                # Read tag name
+                if html[pos] in (" ", "/", ">"):
+                    # Tag name ends
+                    if temp != "":
+                        tag = Parser.__create_tag(temp)
+                        temp = ""
 
-            i += 1
+                    if html[pos] == "/":
+                        # Tag has no body
+                        tag.nobody = True
+                        opens.pop()
 
+                    elif html[pos] == ">":
+                        # Open tag ends
+                        if tag.nobody == False:
+                            opens.append((opens.pop()[0], pos))
+                        tags.append(tag)
+                        state = Parser.State.TEXT
+                else:
+                    # Build tag name
+                    temp += html[pos]
+
+            elif state == Parser.State.TAG_CLOSE:
+                # Read tag name
+                if html[pos] == ">":
+                    # Tag name ends
+                    # TODO: Do something with tag name
+                    closes.append((closes.pop()[0], pos))
+                    temp = ""
+
+                    # Recursively parse child elements
+                    # TODO: We should properly check for close tag
+                    # and we must perform some checks for <script> and <style> tags
+                    # to prevent issues with "<>" characters in embedded CSS or JavaScript
+                    #tag.add(Parser.__parse(html, begin=body_begin, end=pos+1, parent=tag))
+                    open_end = opens.pop()[1]
+                    close_begin = closes.pop()[0]
+
+                    if len(opens) == 0 and len(closes) == 0:
+                        tag.add(Parser.__parse(html, matches, 
+                            begin=open_end+1, end=close_begin, 
+                            parent=tag))
+
+                    state = Parser.State.TEXT
+                else:
+                    # Build tag name
+                    temp += html[pos]
+
+            # Advance position
+            pos += 1
+
+        # Check for errors
         if len(stack) != 0:
             raise Exception("Invalid HTML source code")
 
-        return matches
+        # Check if we have remaining text in temp 
+        # and if we do, we add new text node
+        if temp.strip(" \t\n\r") != "":
+            text = Text(temp)
+            tags.append(text)
+
+        # Return a single tag or list of tags
+        # depending on how many tags were parsed
+        return tags[0] if len(tags) == 1 else tags
 
     @staticmethod
-    def __find_closing_index(opening_index: int, matches: tuple[tuple[int, int]]) -> int:
-        """Find closing tag's index from opening tag's index using matches from __match_tags method
+    def parse(html: str):
+        """Parse HTML source code and return a tag or list of tags
 
         Args:
-            opening_index (int): Opening tag's index
-            matches (tuple[tuple[int, int]]): Matches from __match_tags method
+            html (str): HTML source code
 
         Returns:
-            int: Closing tag's index (returns -1 if not found or if tag doesn't have a body)
+            Tag|list[Tag]: Tag or list of tags
         """
-        for match in matches:
-            if match[0] == opening_index:
-                return match[1]
+        matches = Parser.__match(html)
+        print(matches) # debug
+        #return Parser.__parse(str(html), matches)
 
-        return -1
+    @staticmethod
+    def __match(html: str, begin: int = None, end: int = None) -> tuple[tuple[tuple[int,int],tuple[int,int]]]:
+        """Find open and close tags and their start and end positions.
+        This should only be called once for every parse()
+
+        Args:
+            html (str): HTML source code
+
+        Returns:
+            tuple[tuple[tuple[int,int],tuple[int,int]]]: Matches
+        """
+        if not begin: begin = 0
+        if not end: end = len(html)
+
+        state: Parser.State = Parser.State.TEXT
+        opens: list[tuple(int, int)] = []
+        closes: list[tuple(int, int)] = []
+        matches: list[tuple[tuple[int,int],tuple[int,int]]] = []
+        nobody: bool = False
+
+        pos = begin
+        while pos < end:
+            # Debug
+            #print(f"{pos}: {repr(html[pos])} {state.name}")
+
+            if state == Parser.State.TEXT:
+                # Text content
+                if html[pos] == "<":
+                    if pos < end-1 and html[pos+1] == "/":
+                        # Close tag begins
+                        closes.append((pos, -1))
+                        pos += 1
+                        state = Parser.State.TAG_CLOSE
+                    else:
+                        # Open tag begins
+                        opens.append((pos, -1))
+                        state = Parser.State.TAG_OPEN
+            
+            elif state == Parser.State.TAG_OPEN:
+                # Open tag
+                if html[pos] in (" ", "/", ">"):
+                    # Tag name ends
+                    if html[pos] == " ":
+                        # Attribute begins
+                        state = Parser.State.TAG_ATT
+                    elif html[pos] == "/":
+                        # Tag ends without body
+                        nobody = True
+                    elif html[pos] == ">":
+                        # Open tag ends
+                        open_begin = opens.pop()[0]
+                        
+                        if nobody:
+                            matches.append(((open_begin, pos), (-1, pos)))
+                        else:
+                            opens.append((open_begin, pos))
+
+                        state = Parser.State.TEXT
+
+            elif state == Parser.State.TAG_ATT:
+                if html[pos] in ("/", ">"):
+                    # Attribute ends
+                    pos -= 1
+                    state = Parser.State.TAG_OPEN
+
+            elif state == Parser.State.TAG_CLOSE:
+                # Close tag
+                if html[pos] == ">":
+                    # Close tag ends
+                    close_begin = closes.pop()[0]
+                    matches.append((opens.pop(), (close_begin, pos)))
+                    state = Parser.State.TEXT
+
+            # Advance position
+            pos += 1
+
+        return tuple(matches)
+
+    class State(IntEnum):
+        TEXT = 0
+        DOCTYPE = 1
+        COMMENT = 2
+        TAG_OPEN = 3
+        TAG_ATT = 4
+        TAG_ATT_VALUE = 5
+        TAG_ATT_VALUE_QUOTED = 6
+        TAG_BODY = 7
+        TAG_CLOSE = 8
 
     @staticmethod
     def __get_known_type(tagname: str) -> type|None:
@@ -182,217 +337,3 @@ class Parser:
         if known_type != None:
             tag.__class__ = known_type
         return tag
-        
-
-    class State(IntEnum):
-        TEXT = 0
-        DOCTYPE = 1
-        COMMENT = 2
-        TAG_NAME = 3
-        TAG_ATT = 4
-        TAG_ATT_VALUE = 5
-        TAG_ATT_VALUE_QUOTED = 6
-        TAG_BODY = 7
-        TAG_CLOSE = 8
-
-    @staticmethod
-    def __parse(html: str, begin: int = None, end: int = None, matches: tuple[tuple[int, int]] = None) -> Tag|list[Tag]:
-        """Parse HTML source code and return a tag or list of tags
-
-        Args:
-            html (str): HTML source code
-            begin (int, optional): Begin index
-            end (int, optional): End index
-
-        Raises:
-            Exception: Invalid HTML source code
-
-        Returns:
-            Tag|list[Tag]: Tag or list of tags
-        """
-        if not begin: begin = 0
-        if not end: end = len(html)
-        if not matches: matches = Parser.__match_tags(html)
-
-        state: Parser.State = Parser.State.TEXT
-        stack: list[str|int] = []
-        open_index: int = 0
-        close_index: int = 0
-        tags: list[Tag] = []
-        temp: str = ""
-        tag: Tag = None
-
-        # Parser logic
-        pos = begin
-        while pos < end:
-            if state == Parser.State.TEXT:
-                if html[pos] == "<":
-                    # Opening tag
-                    if temp.strip(" \t\n\r") != "":
-                        # Add text element
-                        text = Text(temp)
-                        text.escape = False
-                        tags.append(text)
-                        temp = ""
-                        
-                    if pos < end-1 and html[pos+1] == "!":
-                        if pos < end-3 and html[pos+2] == "-" and html[pos+3] == "-":
-                            pos += 3
-                            state = Parser.State.COMMENT
-                        else:
-                            state = Parser.State.DOCTYPE
-                    else:
-                        close_index = Parser.__find_closing_index(pos, matches)
-                        state = Parser.State.TAG_NAME
-                else:
-                    # Append text
-                    temp += html[pos]
-
-            elif state == Parser.State.DOCTYPE:
-                if html[pos] == ">":
-                    state = Parser.State.TEXT
-
-            elif state == Parser.State.COMMENT:
-                if html[pos] == "-" and pos < end-2 and html[pos+1] == "-" and html[pos+2] == ">":
-                    # Add comment element
-                    if temp != "":
-                        tags.append(Comment(temp.strip()))
-                        temp = ""
-
-                    pos += 2
-                    state = Parser.State.TEXT
-                else:
-                    temp += html[pos]
-
-            elif state == Parser.State.TAG_NAME:
-                if html[pos] in (" ", ">"):
-                    # End of tag name
-                    if temp != "":
-                        tag = Parser.__create_tag(temp)
-                        tags.append(tag)
-                        temp = ""
-
-                    if html[pos] == " ":
-                        # Tag has attributes
-                        state = Parser.State.TAG_ATT
-                    elif html[pos] == ">":
-                        # End of opening tag
-                        state = Parser.State.TAG_BODY
-
-                elif html[pos] == "/" and pos < end-1 and html[pos+1] == ">":
-                    # End of tag
-                    if temp != "":
-                        tag = Parser.__create_tag(temp)
-                        tags.append(tag)
-                        temp = ""
-
-                    # Tag doesn't have a body
-                    tag.nobody = True
-
-                    pos += 1
-                    state = Parser.State.TEXT
-
-                else:
-                    # Append tag name
-                    temp += html[pos]
-
-            elif state == Parser.State.TAG_ATT:
-                if html[pos] in ("/", ">"):
-                    # End of attributes
-                    if temp != "":
-                        tag.set(temp)
-                        temp = ""
-
-                    pos -= 1
-                    state = Parser.State.TAG_NAME
-
-                elif html[pos] in (" ", "="):
-                    # End of attribute name
-                    if temp != "":
-                        if html[pos] == " ":
-                            tag.set(temp)
-                            temp = ""
-                            pos -= 1
-                            state = Parser.State.TAG_ATT
-
-                        elif html[pos] == "=":
-                            stack.append(temp)
-                            temp = ""
-                            state = Parser.State.TAG_ATT_VALUE
-                else:
-                    temp += html[pos]
-
-            elif state == Parser.State.TAG_ATT_VALUE:
-                if html[pos] in ("\"", "'"):
-                    # Beginning of a quoted value
-                    pos -= 1
-                    state = Parser.State.TAG_ATT_VALUE_QUOTED
-                elif html[pos] in (" ", "/", ">"):
-                    # End of attribute value
-                    # Set attribute value
-                    att_name = stack.pop().lower()
-
-                    if att_name == "class":
-                        tag.set_classes(*temp.split(" "))
-                    else:
-                        tag.set(att_name, temp)
-
-                    temp = ""
-                    pos -= 1
-                    state = Parser.State.TAG_ATT
-                else:
-                    # Append attribute value
-                    temp += html[pos]
-
-            elif state == Parser.State.TAG_ATT_VALUE_QUOTED:
-                quote = html[pos]
-                pos += 1
-                
-                while pos < end:
-                    if html[pos] != quote:
-                        temp += html[pos]
-                    else: break
-                    pos += 1
-
-                state = Parser.State.TAG_ATT_VALUE
-
-            elif state == Parser.State.TAG_BODY:
-                # Recursively parse child elements
-                tag.add(Parser.__parse(html, begin=pos, end=close_index, matches=matches))
-                pos = close_index - 1
-                state = Parser.State.TAG_CLOSE
-
-            elif state == Parser.State.TAG_CLOSE:
-                if html[pos] == ">":
-                    # End of closing tag
-                    state = Parser.State.TEXT
-
-            # Advance position
-            pos += 1
-
-        # Check for errors
-        if len(stack) != 0:
-            raise Exception("Invalid HTML source code")
-
-        # Check if we have remaining text in temp 
-        # and if we do, we add new text node
-        if temp.strip(" \t\n\r") != "":
-            text = Text(temp)
-            text.escape = False
-            tags.append(text)
-
-        # Return a single tag or list of tags
-        # depending on how many tags were parsed
-        return tags[0] if len(tags) == 1 else tags
-
-    @staticmethod
-    def parse(html: str):
-        """Parse HTML source code and return a tag or list of tags
-
-        Args:
-            html (str): HTML source code
-
-        Returns:
-            Tag|list[Tag]: Tag or list of tags
-        """
-        return Parser.__parse(str(html))

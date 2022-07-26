@@ -605,7 +605,7 @@ class Tag:
 
     def __escape(self, input: str, force: bool = False) -> str:
         replaces = (
-            ("\"", "\\\""),
+            ("\"", "&quot;"),
             ("<", "&lt;"),
             (">", "&gt;")
         )
