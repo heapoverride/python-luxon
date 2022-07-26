@@ -3,8 +3,7 @@ from luxon.html.tags import *
 
 class Parser:
     @staticmethod
-    def __parse(html: str, begin: int = None, end: int = None, 
-        parent: Tag = None) -> Tag|list[Tag]:
+    def __parse(html: str, begin: int = None, end: int = None) -> Tag|list[Tag]:
         """Parse HTML source code and return a tag or list of tags
 
         Args:
