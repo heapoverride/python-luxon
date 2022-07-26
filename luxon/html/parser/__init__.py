@@ -87,6 +87,9 @@ class Parser:
                         stack.append((open_begin, tag))
                         state = Parser.State.TEXT
 
+                        # NOTE: Check for void elements
+                        # (area, base, br, col, command, embed, hr, img, input, keygen, link, meta, param, source, track, wbr)
+
                         if tag.nobody:
                             # Has no body
                             stack.pop()
