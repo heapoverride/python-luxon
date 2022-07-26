@@ -128,7 +128,7 @@ class Parser:
             # Advance position
             pos += 1
 
-        # Check for errors
+        # Check for errors (stack should be empty here)
         if len(stack) != 0:
             raise Exception("Invalid HTML source code")
 
