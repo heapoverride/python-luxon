@@ -36,7 +36,6 @@ class Parser:
             if state == Parser.State.TEXT:
                 # Text content
                 if html[pos] == "<":
-                    # Add text element
                     if pos < end-1 and html[pos+1] == "/":
                         # Close tag begins
                         closes.append((pos, -1))
@@ -48,6 +47,15 @@ class Parser:
                             text = Text(temp)
                             temp = ""
                             tag.add(text)
+                    elif pos < end-1 and html[pos+1] == "!":
+                        if pos < end-3 and html[pos+2] == "-" and html[pos+3] == "-": # '<!--'
+                            # Comment begins
+                            state = Parser.State.COMMENT
+                            pos += 3
+                        else:
+                            # Doctype declaration begins
+                            state = Parser.State.DOCTYPE
+                            pos += 1
                     else:
                         # Open tag begins
                         opens.append((pos, -1))
@@ -61,7 +69,6 @@ class Parser:
                                 tag.add(text)
                             else:
                                 tags.append(text)
-
                 else:
                     # Build text content
                     temp += html[pos]
@@ -119,6 +126,31 @@ class Parser:
                         stack[-1][1].add(tag)
 
                     state = Parser.State.TEXT
+
+            elif state == Parser.State.DOCTYPE:
+                # We don't care about doctype at this point
+                if html[pos] == ">":
+                    # Doctype declaration ends
+                    state = Parser.State.TEXT
+
+            elif state == Parser.State.COMMENT:
+                # Comment
+                if pos < end-2 and html[pos:pos+3] == "-->":
+                    # Comment ends
+                    if temp != "":
+                        comment = Comment(temp.strip())
+                        comment.escape = False # Don't escape text in comments
+                        temp = ""
+                        if tag != None:
+                            tag.add(comment)
+                        else:
+                            tags.append(comment)
+
+                    state = Parser.State.TEXT
+                    pos += 2
+                else:
+                    # Build comment
+                    temp += html[pos]
 
             # Show debug help
             #print(f"{pos}:  symbol={repr(html[pos])}  state={state.name}  tag={type(tag)}")
