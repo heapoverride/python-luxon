@@ -2,9 +2,8 @@ from enum import IntEnum
 from luxon.html.tags import *
 
 class Parser:
-    def __parse(html: str, 
-        matches: tuple[tuple[tuple[int,int],tuple[int,int]]],
-        begin: int = None, end: int = None, 
+    @staticmethod
+    def __parse(html: str, begin: int = None, end: int = None, 
         parent: Tag = None) -> Tag|list[Tag]:
         """Parse HTML source code and return a tag or list of tags
 
@@ -22,10 +21,12 @@ class Parser:
         if not begin: begin = 0
         if not end: end = len(html)
 
+        opens: list[tuple(int, int)] = []
+        closes: list[tuple(int, int)] = []
+        matches: list[tuple[tuple[int,int],tuple[int,int]]] = []
+
         state: Parser.State = Parser.State.TEXT
-        opens: list[tuple[int, int]] = [] # For storing encountered open tag positions
-        closes: list[tuple[int, int]] = [] # For storing encountered close tag positions
-        stack: list[Tag] = [] # For storing data
+        stack: list[Tag|str|int] = []
         tags: list[Tag] = []
         temp: str = ""
         tag: Tag = None
@@ -33,74 +34,96 @@ class Parser:
         # Parser logic
         pos = begin
         while pos < end:
-            # debug help
-            print(type(parent), repr(html[pos]), state, stack, opens)
-
             if state == Parser.State.TEXT:
-                # Handle text
+                # Text content
                 if html[pos] == "<":
-                    # Open or close tag begins
-                    if pos < end-1 and html[pos+1] != "/":
+                    # Add text element
+                    if pos < end-1 and html[pos+1] == "/":
+                        # Close tag begins
+                        closes.append((pos, -1))
+                        pos += 1
+                        state = Parser.State.TAG_CLOSE
+
+                        # Add text element (we know a tag is set because this is is a close tag)
+                        if temp != "":
+                            text = Text(temp)
+                            temp = ""
+                            tag.add(text)
+                    else:
                         # Open tag begins
                         opens.append((pos, -1))
                         state = Parser.State.TAG_OPEN
-                    else:
-                        # Close tag begins
-                        closes.append((pos, -1))
-                        state = Parser.State.TAG_CLOSE
-                        pos += 1
-                else:
-                    # Build text
-                    temp += html[pos]
 
+                        # Add text element to parent element or tags
+                        if temp != "":
+                            text = Text(temp)
+                            temp = ""
+                            if tag != None:
+                                tag.add(text)
+                            else:
+                                tags.append(text)
+
+                else:
+                    # Build text content
+                    temp += html[pos]
+            
             elif state == Parser.State.TAG_OPEN:
-                # Read tag name
+                # Open tag
                 if html[pos] in (" ", "/", ">"):
                     # Tag name ends
                     if temp != "":
                         tag = Parser.__create_tag(temp)
                         temp = ""
 
-                    if html[pos] == "/":
-                        # Tag has no body
+                    if html[pos] == " ":
+                        # Attribute begins
+                        state = Parser.State.TAG_ATT
+                    elif html[pos] == "/":
+                        # Tag ends without body
                         tag.nobody = True
-                        opens.pop()
-
                     elif html[pos] == ">":
                         # Open tag ends
-                        if tag.nobody == False:
-                            opens.append((opens.pop()[0], pos))
-                        tags.append(tag)
+                        open_begin = opens.pop()[0]
+
+                        if tag.nobody:
+                            matches.append(((open_begin, pos), (-1, pos)))
+                            tags.append(tag)
+                        else:
+                            opens.append((open_begin, pos))
+
+                        stack.append((open_begin, tag))
                         state = Parser.State.TEXT
                 else:
                     # Build tag name
                     temp += html[pos]
 
+            elif state == Parser.State.TAG_ATT:
+                if html[pos] in ("/", ">"):
+                    # Attribute ends
+                    pos -= 1
+                    state = Parser.State.TAG_OPEN
+
             elif state == Parser.State.TAG_CLOSE:
-                # Read tag name
+                # Close tag
                 if html[pos] == ">":
-                    # Tag name ends
-                    # TODO: Do something with tag name
-                    closes.append((closes.pop()[0], pos))
-                    temp = ""
-
-                    # Recursively parse child elements
-                    # TODO: We should properly check for close tag
-                    # and we must perform some checks for <script> and <style> tags
-                    # to prevent issues with "<>" characters in embedded CSS or JavaScript
-                    #tag.add(Parser.__parse(html, begin=body_begin, end=pos+1, parent=tag))
-                    open_end = opens.pop()[1]
+                    # Close tag ends
+                    open_begin, open_tag = stack.pop()
+                    tag = open_tag
                     close_begin = closes.pop()[0]
-
-                    if len(opens) == 0 and len(closes) == 0:
-                        tag.add(Parser.__parse(html, matches, 
-                            begin=open_end+1, end=close_begin, 
-                            parent=tag))
+                    matches.append((opens.pop(), (close_begin, pos)))
+                    
+                    if len(stack) == 0:
+                        # Has no parent tag
+                        tags.append(open_tag)
+                    else:
+                        # Has parent tag
+                        stack[-1][1].add(tag)
 
                     state = Parser.State.TEXT
-                else:
-                    # Build tag name
-                    temp += html[pos]
+
+            # Show debug help
+            #print(f"{pos}:  symbol={repr(html[pos])}  state={state.name}  tag={type(tag)}")
+            #print(stack)
 
             # Advance position
             pos += 1
@@ -129,87 +152,7 @@ class Parser:
         Returns:
             Tag|list[Tag]: Tag or list of tags
         """
-        matches = Parser.__match(html)
-        print(matches) # debug
-        #return Parser.__parse(str(html), matches)
-
-    @staticmethod
-    def __match(html: str, begin: int = None, end: int = None) -> tuple[tuple[tuple[int,int],tuple[int,int]]]:
-        """Find open and close tags and their start and end positions.
-        This should only be called once for every parse()
-
-        Args:
-            html (str): HTML source code
-
-        Returns:
-            tuple[tuple[tuple[int,int],tuple[int,int]]]: Matches
-        """
-        if not begin: begin = 0
-        if not end: end = len(html)
-
-        state: Parser.State = Parser.State.TEXT
-        opens: list[tuple(int, int)] = []
-        closes: list[tuple(int, int)] = []
-        matches: list[tuple[tuple[int,int],tuple[int,int]]] = []
-        nobody: bool = False
-
-        pos = begin
-        while pos < end:
-            # Debug
-            #print(f"{pos}: {repr(html[pos])} {state.name}")
-
-            if state == Parser.State.TEXT:
-                # Text content
-                if html[pos] == "<":
-                    if pos < end-1 and html[pos+1] == "/":
-                        # Close tag begins
-                        closes.append((pos, -1))
-                        pos += 1
-                        state = Parser.State.TAG_CLOSE
-                    else:
-                        # Open tag begins
-                        opens.append((pos, -1))
-                        state = Parser.State.TAG_OPEN
-            
-            elif state == Parser.State.TAG_OPEN:
-                # Open tag
-                if html[pos] in (" ", "/", ">"):
-                    # Tag name ends
-                    if html[pos] == " ":
-                        # Attribute begins
-                        state = Parser.State.TAG_ATT
-                    elif html[pos] == "/":
-                        # Tag ends without body
-                        nobody = True
-                    elif html[pos] == ">":
-                        # Open tag ends
-                        open_begin = opens.pop()[0]
-                        
-                        if nobody:
-                            matches.append(((open_begin, pos), (-1, pos)))
-                        else:
-                            opens.append((open_begin, pos))
-
-                        state = Parser.State.TEXT
-
-            elif state == Parser.State.TAG_ATT:
-                if html[pos] in ("/", ">"):
-                    # Attribute ends
-                    pos -= 1
-                    state = Parser.State.TAG_OPEN
-
-            elif state == Parser.State.TAG_CLOSE:
-                # Close tag
-                if html[pos] == ">":
-                    # Close tag ends
-                    close_begin = closes.pop()[0]
-                    matches.append((opens.pop(), (close_begin, pos)))
-                    state = Parser.State.TEXT
-
-            # Advance position
-            pos += 1
-
-        return tuple(matches)
+        return Parser.__parse(str(html))
 
     class State(IntEnum):
         TEXT = 0
@@ -221,6 +164,24 @@ class Parser:
         TAG_ATT_VALUE_QUOTED = 6
         TAG_BODY = 7
         TAG_CLOSE = 8
+
+    @staticmethod
+    def __find(func: Callable[[tuple[tuple[int,int],tuple[int,int]]], bool],
+        matches: list[tuple[tuple[int,int],tuple[int,int]]]) -> tuple[tuple[int,int],tuple[int,int]]|None:
+        """Find a match from list of matches
+
+        Args:
+            func (Callable[[tuple[tuple[int,int],tuple[int,int]]], bool]): Lambda expression or named function
+            matches (list[tuple[tuple[int,int],tuple[int,int]]]): List of matches
+
+        Returns:
+            tuple[tuple[int,int],tuple[int,int]]|None: Found match or None
+        """
+        for match in matches:
+            # match = ((open_begin, open_end), (close_begin, close_end))
+            if func(match): return match
+
+        return None
 
     @staticmethod
     def __get_known_type(tagname: str) -> type|None:
