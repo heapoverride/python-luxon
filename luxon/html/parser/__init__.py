@@ -134,7 +134,7 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
-        if temp.strip(" \t\n\r") != "":
+        if temp != "":
             text = Text(temp)
             tags.append(text)
 
