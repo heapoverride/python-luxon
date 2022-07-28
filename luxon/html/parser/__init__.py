@@ -30,6 +30,11 @@ class Parser:
         temp: str = ""
         tag: Tag = None
 
+        # These tags must not have a body
+        void_tags = (
+            "area", "base", "br", "col", "command", "embed", "hr", "img", "input", 
+            "keygen", "link", "meta", "param", "source", "track", "wbr")
+
         # Parser logic
         pos = begin
         while pos < end:
@@ -84,17 +89,17 @@ class Parser:
                     elif html[pos] == ">":
                         # Open tag ends
                         open_begin = opens.pop()[0]
-                        stack.append((open_begin, tag))
+                        #stack.append((open_begin, tag))
                         state = Parser.State.TEXT
 
-                        # NOTE: Check for void elements
-                        # (area, base, br, col, command, embed, hr, img, input, keygen, link, meta, param, source, track, wbr)
+                        if tag.tagname in void_tags:
+                            # Void tags must not have a body
+                            tag.nobody = True
 
                         if tag.nobody:
                             # Has no body
-                            stack.pop()
                             matches.append(((open_begin, pos), (-1, pos)))
-                            tags.append(tag)
+                            #tags.append(tag)
                         else:
                             # Has body
                             opens.append((open_begin, pos))
@@ -223,14 +228,6 @@ class Parser:
             pos += 1
 
         # Check for errors (stack should be empty here)
-        #while len(stack) != 0:
-        #    item = stack.pop()
-        #    if type(item) == tuple:
-        #        t = item[1]
-        #        t.nobody = True
-        #        tags.append(t)
-        #        continue
-        #    raise Exception("Invalid HTML source code")
         if len(stack) != 0:
             raise Exception("Invalid HTML source code")
 
