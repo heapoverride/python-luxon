@@ -11,19 +11,132 @@ class Tag:
         Args:
             tagname (str): Name of the HTML tag
         """
-        self.tagname: str = tagname.lower() if type(tagname) == str else tagname
+        self.__tagname: str = None
         self.__attributes: dict[str, Any] = {}
         self.__classes: list[str] = []
         self.__styles: dict[str, str] = {}
         self.__tags: list[Tag] = []
-        self.text: Any = None
-        self.before: Any = None
-        self.after: Any = None
-        self.escape: bool = True
-        self.nobody: bool = False
-        self.is_text: bool = False
-        self.hidden: bool = False
-        self.parent: Tag = None
+        self.__text: Any = None
+        self.__before: Any = None
+        self.__after: Any = None
+        self.__escape: bool = True
+        self.__nobody: bool = False
+        self.__is_text: bool = False
+        self.__hidden: bool = False
+        self.__parent: Tag = None
+
+        if type(tagname) == str:
+            self.__tagname = tagname.lower()
+
+    @property
+    def tagname(self) -> str:
+        """Element's tag name
+
+        Returns:
+            str: Tag name
+        """
+        return self.__tagname
+
+    @property
+    def before(self) -> Any:
+        """Element's before element
+
+        Returns:
+            Any: Before element
+        """
+        return self.__before
+
+    @before.setter
+    def before(self, value: Any):
+        self.__before = value
+
+    @property
+    def after(self) -> Any:
+        """Element's after element
+
+        Returns:
+            Any: After element
+        """
+        return self.__after
+
+    @after.setter
+    def after(self, value: Any):
+        self.__after = value
+
+    @property
+    def text(self) -> Any:
+        """Element's text content
+
+        Returns:
+            Any: Text content
+        """
+        return self.__text
+
+    @text.setter
+    def text(self, value: Any):
+        self.__is_text = True
+        self.__text = value
+
+    @property
+    def is_text(self) -> bool:
+        """Set to True if this element is a text element
+
+        Hint:
+            You can also compare tag type to Text to get if
+            this element is a text element or not.
+
+        Returns:
+            bool: True if this element is a text element
+        """
+        return self.__is_text
+
+    @property
+    def escape(self) -> bool:
+        """Set to True if element's text content should be escaped
+
+        Returns:
+            bool: True if text content should be escaped
+        """
+        return self.__escape
+
+    @escape.setter
+    def escape(self, value: bool):
+        self.__escape = value
+
+    @property
+    def nobody(self) -> bool:
+        """Element doesn't have a body
+
+        Returns:
+            bool: True if element doesn't have a body
+        """
+        return self.__nobody
+
+    @nobody.setter
+    def nobody(self, value: bool):
+        self.__nobody = value
+
+    @property
+    def hidden(self) -> bool:
+        """Element is hidden (will not be shown in output)
+
+        Returns:
+            bool: True if element is hidden
+        """
+        return self.__hidden
+
+    @hidden.setter
+    def hidden(self, value: bool):
+        self.__hidden = value
+
+    @property
+    def parent(self) -> Tag|None:
+        """Parent element
+
+        Returns:
+            Tag|None: Parent element or None if element has no parent
+        """
+        return self.__parent
 
     def set_text(self, text: Any):
         """Set displayed text and mark this element a text element
@@ -34,8 +147,8 @@ class Tag:
         Returns:
             self
         """
-        self.is_text = True
-        self.text = text
+        self.__is_text = True
+        self.__text = text
         return self
 
     def add(self, *tags: Tag|list[Tag|str]|str):
@@ -50,7 +163,7 @@ class Tag:
             elif type(tag) == list:
                 self.add(*tag)
             else:
-                tag.parent = self
+                tag.__parent = self
                 self.__tags.append(tag)
         return self
 
@@ -388,7 +501,7 @@ class Tag:
         Returns:
             Tag|None: Found element or None if no element was found
         """
-        return self.find(lambda tag: tag.tagname == tagname, 
+        return self.find(lambda tag: tag.__tagname == tagname, 
             recurse=recurse, 
             max_depth=max_depth)
 
@@ -403,7 +516,7 @@ class Tag:
         Returns:
             list[Tag]: List of found elements
         """
-        return self.find_all(lambda tag: tag.tagname == tagname, 
+        return self.find_all(lambda tag: tag.__tagname == tagname, 
             recurse=recurse, 
             max_depth=max_depth)
 
@@ -521,54 +634,54 @@ class Tag:
         result: str = ""
 
         # Return now if element is hidden
-        if self.hidden: return result
+        if self.__hidden: return result
 
         # Call update
         self.update()
 
         # Add before element
         indented_before = False
-        if self.before != None:
+        if self.__before != None:
             if pretty and depth > 0:
                 result += "\n" + self.__indent(depth)
                 indented_before = True
-            result += str(self.before)
+            result += str(self.__before)
 
         # Check if this element is a text element
-        if self.is_text:
+        if self.__is_text:
             if pretty and depth > 0 and extend and not indented_before:
                 result += "\n" + self.__indent(depth)
-            result += self.__escape(str(self.text))
+            result += self.__escape_str(str(self.__text))
         else:
             # Add opening tag
             if pretty and depth > 0:
                 result += "\n" + self.__indent(depth)
             has_props = len(self.__attributes) + len(self.__classes) + len(self.__styles) > 0
-            result += f"<{self.tagname}" + (" " if has_props else "")
+            result += f"<{self.__tagname}" + (" " if has_props else "")
 
             # Add attributes & styles
             attributes = self.__attributes
 
             if len(self.__classes) > 0:
-                attributes["class"] = " ".join(self.__escape(x, force=True) for x in self.__classes)
+                attributes["class"] = " ".join(self.__escape_str(x, force=True) for x in self.__classes)
 
             if len(self.__styles) > 0:
                 styles = []
                 for key, value in self.__styles.items():
-                    styles.append(f"{self.__escape(key, force=True)}: {self.__escape(value, force=True)}")
+                    styles.append(f"{self.__escape_str(key, force=True)}: {self.__escape_str(value, force=True)}")
                 attributes["style"] = "; ".join(styles)
 
             temp = []
             for key, value in attributes.items():
                 if value == True:
-                    temp.append(self.__escape(key))
+                    temp.append(self.__escape_str(key))
                 else:
-                    temp.append(f"{self.__escape(key)}=\"{self.__escape(str(value), force=True)}\"")
+                    temp.append(f"{self.__escape_str(key)}=\"{self.__escape_str(str(value), force=True)}\"")
             result += " ".join(temp)
 
             # Add child tags
             text_only = True
-            if not self.nobody:
+            if not self.__nobody:
                 result += ">"
                 
                 new_depth = depth+1
@@ -578,13 +691,13 @@ class Tag:
                     result += tag.__html(pretty, depth=new_depth, extend=not text_only)
 
             # Add closing tag
-            if not self.nobody and not text_only and len(self.__tags) != 0 and pretty:
+            if not self.__nobody and not text_only and len(self.__tags) != 0 and pretty:
                 result += "\n" + self.__indent(depth)
-            result += " />" if self.nobody else f"</{self.tagname}>"
+            result += " />" if self.__nobody else f"</{self.__tagname}>"
 
         # Add after element
-        if self.after != None:
-            result += str(self.after)
+        if self.__after != None:
+            result += str(self.__after)
 
         return result
 
@@ -603,14 +716,14 @@ class Tag:
     def __indent(depth: int) -> str:
         return "    " * depth
 
-    def __escape(self, input: str, force: bool = False) -> str:
+    def __escape_str(self, input: str, force: bool = False) -> str:
         replaces = (
             ("\"", "&quot;"),
             ("<", "&lt;"),
             (">", "&gt;")
         )
 
-        if self.escape or force:
+        if self.__escape or force:
             for old, new in replaces:
                 input = input.replace(old, new)
 
@@ -652,7 +765,7 @@ class Text(Tag):
             text (Any): String value or other type that can be converted to string
         """
         super().__init__(None)
-        self.set_text(text)
+        self.text = text
 
     def __str__(self):
         return str(self.text)

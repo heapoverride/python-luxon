@@ -53,9 +53,9 @@ class Style(Tag):
         Returns:
             self
         """
-        if self.name != "style": return self
+        if self.tagname != "style": return self
 
-        css_text = Text(css_text)
+        css_text: Text = Text(css_text)
         css_text.escape = False
         self.add(css_text)
         return self
@@ -448,7 +448,7 @@ class Script(Tag):
         Returns:
             self
         """
-        code = Text(code)
+        code: Text = Text(code)
         code.escape = False
         self.add(code)
         return self
@@ -1113,6 +1113,6 @@ class Comment(Tag):
             comment (str): Comment
         """
         super().__init__(None)
-        self.set_text(comment)
+        self.text = comment
         self.before = "<!-- "
         self.after = " -->"
