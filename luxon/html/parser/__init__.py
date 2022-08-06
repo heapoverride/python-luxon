@@ -62,12 +62,14 @@ class Parser:
 
                     # Add text element to parent element or tags
                     if state != Parser.State.TEXT and temp != "":
-                        text = Text(temp)
+                        if temp.strip(" \t\r\n") != "":
+                            text = Text(temp)
+                            if tag != None:
+                                tag.add(text)
+                            else:
+                                tags.append(text)
+
                         temp = ""
-                        if tag != None:
-                            tag.add(text)
-                        else:
-                            tags.append(text)
                 else:
                     # Build text content
                     temp += html[pos]
@@ -89,7 +91,6 @@ class Parser:
                     elif html[pos] == ">":
                         # Open tag ends
                         open_begin = opens.pop()[0]
-                        #stack.append((open_begin, tag))
                         state = Parser.State.TEXT
 
                         if tag.tagname in void_tags:
@@ -99,10 +100,21 @@ class Parser:
                         if tag.nobody:
                             # Has no body
                             matches.append(((open_begin, pos), (-1, pos)))
-                            #tags.append(tag)
+                            
+                            parent: Tag = None
+                            if len(stack) != 0:
+                                parent = stack[-1][1]
+
+                            if parent != None:
+                                parent.add(tag)
+                            else:
+                                tags.append(tag)
+
+                            tag = parent
                         else:
                             # Has body
                             opens.append((open_begin, pos))
+                            stack.append((open_begin, tag))
 
                             if type(tag) in (Style, Script):
                                 # Do not parse <style> and <script> element bodies
@@ -233,7 +245,7 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
-        if temp != "":
+        if temp.strip(" \t\r\n") != "":
             text = Text(temp)
             tags.append(text)
 
