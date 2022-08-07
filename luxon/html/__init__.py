@@ -636,6 +636,12 @@ class Tag:
         # Return now if element is hidden
         if self.__hidden: return result
 
+        if type(self) == Root:
+            # This element is a Root element
+            for tag in self.__tags:
+                result += tag.__html(pretty)
+            return result
+
         # Call update
         self.update()
 
@@ -755,6 +761,21 @@ class Tag:
 
     def __repr__(self): 
         return self.__str__()
+
+class Root(Tag):
+    def __init__(self, *content: str|Tag):
+        """Construct a Root element
+
+        Hint:
+            Parser returns a Root element when the document root 
+            contains multiple elements such as comments, text and other 
+            misplaced tags outside <html>
+        
+        Args:
+            *content (str|Tag): Content
+        """
+        super().__init__(None)
+        self.add(*content)
 
 class Text(Tag):
     """Text element"""

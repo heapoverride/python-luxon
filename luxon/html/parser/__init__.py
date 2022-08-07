@@ -3,8 +3,8 @@ from luxon.html.tags import *
 
 class Parser:
     @staticmethod
-    def __parse(html: str, begin: int = None, end: int = None) -> Tag|list[Tag]:
-        """Parse HTML source code and return a tag or list of tags
+    def __parse(html: str, begin: int = None, end: int = None) -> Tag:
+        """Parse HTML source code
 
         Args:
             html (str): HTML source code
@@ -15,7 +15,7 @@ class Parser:
             Exception: Invalid HTML source code
 
         Returns:
-            Tag|list[Tag]: Tag or list of tags
+            Tag
         """
         if not begin: begin = 0
         if not end: end = len(html)
@@ -251,19 +251,20 @@ class Parser:
             text = Text(temp)
             tags.append(text)
 
-        # Return a single tag or list of tags
-        # depending on how many tags were parsed
-        return tags[0] if len(tags) == 1 else tags
+        return tags[0] if len(tags) == 1 else Root(*tags)
 
     @staticmethod
-    def parse(html: str):
-        """Parse HTML source code and return a tag or list of tags
+    def parse(html: str) -> Tag:
+        """Parse HTML source code
 
         Args:
             html (str): HTML source code
 
+        Raises:
+            Exception: Invalid HTML source code
+
         Returns:
-            Tag|list[Tag]: Tag or list of tags
+            Tag
         """
         return Parser.__parse(str(html))
 
