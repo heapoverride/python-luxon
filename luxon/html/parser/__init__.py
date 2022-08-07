@@ -175,21 +175,23 @@ class Parser:
             elif state == Parser.State.TAG_CLOSE:
                 # Close tag
                 if html[pos] == ">":
-                    # Close tag ends
-                    open_begin, open_tag = stack.pop()
-                    close_begin = closes.pop()[0]
-                    matches.append((opens.pop(), (close_begin, pos)))
+                    # Close tag ends (ignore if tag not set)
+                    if tag != None:
+                        open_begin, open_tag = stack.pop()
+                        close_begin = closes.pop()[0]
+                        matches.append((opens.pop(), (close_begin, pos)))
 
-                    parent: Tag = None
-                    if len(stack) != 0:
-                        parent = stack[-1][1]
+                        parent: Tag = None
+                        if len(stack) != 0:
+                            parent = stack[-1][1]
 
-                    if parent != None:
-                        parent.add(tag)
-                    else:
-                        tags.append(tag)
+                        if parent != None:
+                            parent.add(tag)
+                        else:
+                            tags.append(tag)
 
-                    tag = parent
+                        tag = parent
+
                     state = Parser.State.TEXT
 
             elif state == Parser.State.DOCTYPE:
