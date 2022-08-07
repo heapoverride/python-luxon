@@ -7,11 +7,31 @@ This repository contains some parts of my Luxon framework (PHP) implemented usin
 from luxon.html.parser import Parser
 
 def main():
-    item = Parser.parse("<h1>Hello world!</h1>")
-    print(item)
+    h1 = Parser.parse("<h1>Hello world!</h1>")
+    print(h1)
 
-    items = Parser.parse("<h1>Hello</h1><h2>world!</h2>")
-    print(items)
+if __name__ == "__main__":
+    main()
+```
+```py
+from luxon.html.parser import Parser
+
+def main():
+    html = requests.get("https://nsa.gov/").content.decode("utf-8")
+    parsed = Parser.parse(html)
+    texts = parsed.find_all(lambda t: type(t) == Text and type(t.parent) not in (Style, Script))
+    print([repr(t) for t in texts])
+
+if __name__ == "__main__":
+    main()
+```
+```py
+from luxon.html.parser import Parser
+
+def main():
+    html = requests.get("https://example.com/").content.decode("utf-8")
+    parsed = Parser.parse(html)
+    print(parsed.find_by_type(H1).read_text())
 
 if __name__ == "__main__":
     main()
