@@ -122,7 +122,8 @@ class Parser:
                                 state = Parser.State.NO_PARSE
                 else:
                     # Build tag name
-                    temp += html[pos]
+                    if html[pos].isalnum():
+                        temp += html[pos]
 
             elif state == Parser.State.TAG_ATT:
                 if html[pos] in (" ", "=", "/", ">"):
@@ -143,7 +144,8 @@ class Parser:
                             temp = ""
                 else:
                     # Build attribute name
-                    temp += html[pos]
+                    if html[pos].isalnum() or html[pos] == "-":
+                        temp += html[pos]
 
             elif state == Parser.State.TAG_ATT_VALUE:
                 # Attribute value
@@ -158,7 +160,9 @@ class Parser:
                     pos -= 1
                     state = Parser.State.TAG_ATT_VALUE_QUOTED
                 else:
-                    temp += html[pos]
+                    # Build attribute value
+                    if html[pos].isalnum():
+                        temp += html[pos]
 
             elif state == Parser.State.TAG_ATT_VALUE_QUOTED:
                 # Attribute value in quotes
