@@ -151,6 +151,18 @@ class Tag:
         self.__text = text
         return self
 
+    def read_text(self, recurse: bool = True, max_depth: int = None) -> str:
+        """Read element's text content
+
+        Args:
+            recurse (bool, optional): Use recursion. Defaults to `True`.
+            max_depth (int, optional): Max recursion depth. Defaults to `None`.
+
+        Returns:
+            str: Text content
+        """
+        return "".join([str(t) for t in self.find_all(lambda t: type(t) == Text, recurse, max_depth)])
+
     def add(self, *tags: Tag|list[Tag|str]|str):
         """Add child elements to this element
 
