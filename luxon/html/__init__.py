@@ -177,6 +177,8 @@ class Tag:
             else:
                 tag.__parent = self
                 self.__tags.append(tag)
+
+        self.__nobody = False
         return self
 
     def set_body(self, *tags: Tag|list[Tag|str]|str):
@@ -208,8 +210,18 @@ class Tag:
         Returns:
             self
         """
+        self.nobody = True
         self.__tags.clear()
         return self
+
+    def sort(self, key: Callable[[Tag], Any], reverse: bool = False):
+        """Sort child elements
+
+        Args:
+            key (Callable[[Tag], Any]): Sort by key. (supports rich comparison)
+            reverse (bool, optional): Reverse sort. Defaults to False.
+        """
+        self.__tags.sort(key=key, reverse=reverse)
 
     def insert(self, index: int, *tags: Tag|list[Tag|str]|str):
         """Insert child elements at specific index
