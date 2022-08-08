@@ -219,7 +219,7 @@ class Tag:
 
         Args:
             key (Callable[[Tag], Any]): Sort by key. (supports rich comparison)
-            reverse (bool, optional): Reverse sort. Defaults to False.
+            reverse (bool, optional): Reverse sort. Defaults to `False`.
         """
         self.__tags.sort(key=key, reverse=reverse)
 
