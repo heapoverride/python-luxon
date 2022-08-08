@@ -650,9 +650,7 @@ class Tag:
 
         if type(self) == Root:
             # This element is a Root element
-            for tag in self.__tags:
-                result += tag.__html(pretty)
-            return result
+            return "\n".join([t.__html(pretty) for t in self.__tags])
 
         # Call update
         self.update()
