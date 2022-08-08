@@ -15,6 +15,7 @@ if __name__ == "__main__":
 ```
 ```py
 from luxon.html.parser import Parser
+from luxon.html.tags import *
 
 def main():
     html = requests.get("https://nsa.gov/").content.decode("utf-8")
@@ -27,11 +28,43 @@ if __name__ == "__main__":
 ```
 ```py
 from luxon.html.parser import Parser
+from luxon.html.tags import *
 
 def main():
     html = requests.get("https://example.com/").content.decode("utf-8")
     parsed = Parser.parse(html)
     print(parsed.find_by_type(H1).read_text())
+
+if __name__ == "__main__":
+    main()
+```
+```py
+from luxon.html.parser import Parser
+from luxon.html.tags import *
+
+def main():
+    parsed1 = Parser.parse("<header/><main/><footer/>")
+    # returns a Root element (because more than 1 top-level tags) 
+
+    parsed2 = Parser.parse("<!-- Hello world! --><ul><li>Banana</li><li>Mango</li><li>Apricot</li></ul>")
+    # returns a Root element
+
+    # Find the first Main element and 
+    # add Root element's children to it
+    parsed1.find_by_type(Main) \
+        .add(*parsed2) 
+    
+    # Find the first Ul element
+    # and add new list item to it
+    fruits: Ul = parsed1.find_by_type(Ul)
+    fruits.add_item("Pear")
+
+    # Sort child elements
+    fruits.sort(key=lambda fruit: fruit.read_text())
+    #sorted_fruits = sorted(fruits, key=lambda t: t.read_text())
+
+    # Print source code
+    print(parsed1.html(pretty=True))
 
 if __name__ == "__main__":
     main()
