@@ -733,7 +733,7 @@ class Tag:
         """Generate this element's HTML source code
 
         Args:
-            pretty (bool, optional): Pretty print the source code. Defaults to False.
+            pretty (bool, optional): Pretty print the source code. Defaults to `False`.
 
         Returns:
             str: Generated HTML source code
