@@ -701,7 +701,7 @@ class Tag:
 
             temp = []
             for key, value in attributes.items():
-                if value == True:
+                if type(value) == bool and value == True:
                     temp.append(self.__escape_str(key))
                 else:
                     temp.append(f"{self.__escape_str(key)}=\"{self.__escape_str(str(value), force=True)}\"")

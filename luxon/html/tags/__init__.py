@@ -19,7 +19,7 @@ class Title(Tag):
     def __init__(self, title: str|Text = None):
         """Construct a Title element"""
         super().__init__("title")
-        if title: self.add(title)
+        if title != None: self.add(title)
 
 class Meta(Tag):
     """Defines the metadata of an HTML document"""
@@ -36,7 +36,7 @@ class Style(Tag):
         Args:
             source (str, optional): Source stylesheet to link. Defaults to None.
         """
-        if source:
+        if source != None:
             super().__init__("link")
             self.nobody = True
             self.set("rel", "stylesheet")
@@ -74,7 +74,7 @@ class Link(Tag):
         self.nobody = True
         self.set("rel", relation)
         self.set("href", target)
-        if media_type: self.set("type", media_type)
+        if media_type != None: self.set("type", media_type)
 
 class Body(Tag):
     """Defines the body section of an HTML document"""
@@ -390,7 +390,7 @@ class Form(Tag):
             method = "POST"
         self.set("method", method.upper())
         
-        if action: self.set("action", action)
+        if action != None: self.set("action", action)
         if multipart: self.set("enctype", "multipart/form-data")
 
 class Input(Tag):
@@ -407,9 +407,9 @@ class Input(Tag):
         super().__init__("input")
         self.set("type", type.lower())
         self.nobody = True
-        if id: self.set_id(id)
-        if name: self.set_name(name)
-        if value: self.set_value(value)
+        if id != None: self.set_id(id)
+        if name != None: self.set_name(name)
+        if value != None: self.set_value(value)
 
 class Textarea(Tag):
     """Used to define multiple line input, such as comment, feedback, and review"""
@@ -423,10 +423,10 @@ class Textarea(Tag):
             height (int, optional): Textarea height (lines). Defaults to None.
         """
         super().__init__("textarea")
-        if id: self.set_id(id)
-        if name: self.set_name(name)
-        if width: self.set("width", str(width))
-        if height: self.set("height", str(height))
+        if id != None: self.set_id(id)
+        if name != None: self.set_name(name)
+        if width != None: self.set("width", str(width))
+        if height != None: self.set("height", str(height))
 
 class Script(Tag):
     """Used to declare the JavaScript within HTML document"""
@@ -437,7 +437,7 @@ class Script(Tag):
             source (str, optional): Source JavaScript file. Defaults to None.
         """
         super().__init__("script")
-        if source: self.set("src", source)
+        if source != None: self.set("src", source)
 
     def add_code(self, code: str):
         """Add code to this Script element
@@ -463,8 +463,8 @@ class Select(Tag):
             name (str, optional): Name attribute. Defaults to None.
         """
         super().__init__("select")
-        if id: self.set_id(id)
-        if name: self.set_name(name)
+        if id != None: self.set_id(id)
+        if name != None: self.set_name(name)
 
     def add_option(self, text: str, value: str = None, disabled: bool = False):
         """Add an Option to this Select element
@@ -492,7 +492,7 @@ class Option(Tag):
         """
         super().__init__("option")
         self.add(text)
-        if value: self.set_value(value)
+        if value != None: self.set_value(value)
         if disabled: self.set("disabled")
 
 class Iframe(Tag):
@@ -504,7 +504,7 @@ class Iframe(Tag):
             source (str, optional): Specifies the address of the document to embed. Defaults to None.
         """
         super().__init__("iframe")
-        if source: self.set("src", source)
+        if source != None: self.set("src", source)
 
 class Table(Tag):
     """Used to present data in tabular form or to create a table within HTML document"""
@@ -707,8 +707,8 @@ class Source(Tag):
         elif type(source) == list:
             self.set("srcset", ",".join(source))
 
-        if mime_type: self.set("type", mime_type)
-        if media_query: self.set("media", media_query)
+        if mime_type != None: self.set("type", mime_type)
+        if media_query != None: self.set("media", media_query)
 
 class Picture(Tag):
     """Defines more than one source elements and one image element"""
@@ -756,12 +756,12 @@ class Audio(Tag):
             preload (str, optional): Specifies if and how the audio should be loaded when the page loads. Defaults to None.
         """
         super().__init__("audio")
-        if source: self.set("src", source)
+        if source != None: self.set("src", source)
         if autoplay: self.set("autoplay", True)
         if controls: self.set("controls", True)
         if loop: self.set("loop", True)
         if muted: self.set("muted", True)
-        if preload: self.set("preload", preload)
+        if preload != None: self.set("preload", preload)
 
     def add_source(self, source: str, mime_type: str):
         """Add source to this audio element
@@ -793,15 +793,15 @@ class Video(Tag):
             preload (str, optional): Specifies if and how the author thinks the video should be loaded when the page loads. Defaults to None.
         """
         super().__init__("video")
-        if source: self.set("src", source)
-        if width: self.set("width", str(width))
-        if height: self.set("height", str(height))
-        if poster: self.set("poster", poster)
+        if source != None: self.set("src", source)
+        if width != None: self.set("width", str(width))
+        if height != None: self.set("height", str(height))
+        if poster != None: self.set("poster", poster)
         if autoplay: self.set("autoplay", True)
         if controls: self.set("controls", True)
         if loop: self.set("loop", True)
         if muted: self.set("muted", True)
-        if preload: self.set("preload", preload)
+        if preload != None: self.set("preload", preload)
 
     def add_source(self, source: str, type: str):
         """Add source to this video element
@@ -894,10 +894,10 @@ class Track(Tag):
             label (str): Specifies the title of the text track
         """
         super().__init__("track")
-        if source: self.set("src", source)
-        if kind: self.set("kind", kind)
-        if lang: self.set("srclang", lang)
-        if label: self.set("label", label)
+        if source != None: self.set("src", source)
+        if kind != None: self.set("kind", kind)
+        if lang != None: self.set("srclang", lang)
+        if label != None: self.set("label", label)
 
 class Small(Tag):
     """Used to make text font one size smaller than document's base font size"""
@@ -1008,8 +1008,8 @@ class Label(Tag):
             for_id (str, optional): ID of the element this label is associated with. Defaults to None.
         """
         super().__init__("label")
-        if text: self.add(text)
-        if for_id: self.set("for", for_id)
+        self.add(text)
+        if for_id != None: self.set("for", for_id)
 
 class Sub(Tag):
     """Defines a text which displays as a subscript text"""
@@ -1102,7 +1102,7 @@ class Img(Tag):
         super().__init__("img")
         self.nobody = True
         self.set("src", src)
-        if alt: self.set("alt", alt)
+        if alt != None: self.set("alt", alt)
 
 class Comment(Tag):
     """Comments are not displayed in the browsers but they're visible in the source code"""
