@@ -702,7 +702,21 @@ class Tag:
 
         if type(self) == Root:
             # This element is a Root element
-            return ("\n" if pretty else "").join([t.__html(pretty) for t in self.__tags])
+            first = True
+
+            for tag in self.__tags:
+                if not first:
+                    if type(tag) == Text:
+                        if tag.text == " ":
+                            result += " "
+                            continue
+                    else:
+                        if pretty: result += "\n"
+
+                first = False
+                result += tag.__html(pretty)
+
+            return result
 
         # Call update
         self.update()
@@ -717,9 +731,14 @@ class Tag:
 
         # Check if this element is a text element
         if self.__is_text:
-            if pretty and depth > 0 and extend and not indented_before:
-                result += "\n" + self.__indent(depth)
-            result += self.__escape_str(str(self.__text))
+            if self.__text != " ":
+                # Add text
+                if pretty and depth > 0 and extend and not indented_before:
+                    result += "\n" + self.__indent(depth)
+                result += self.__escape_str(str(self.__text))
+            else:
+                # Add whitespace
+                result += " "
         else:
             # Add opening tag
             if pretty and depth > 0:

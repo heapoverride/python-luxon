@@ -64,12 +64,11 @@ class Parser:
 
                     # Add text element to parent element or tags
                     if state != Parser.State.TEXT and temp != "":
-                        if temp.strip(" \t\n\r") != "":
-                            text = Parser.__create_text(temp, parent=tag)
-                            if tag != None:
-                                tag.add(text)
-                            else:
-                                tags.append(text)
+                        text = Parser.__create_text(temp, parent=tag)
+                        if tag != None:
+                            tag.add(text)
+                        else:
+                            tags.append(text)
 
                         temp = ""
                 else:
@@ -253,10 +252,23 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
-        if temp != "" and temp.strip(" \t\n\r") != "":
+        if temp != "":
             tags.append(Parser.__create_text(temp, parent=tag))
 
-        return tags[0] if len(tags) == 1 else Root(*tags)
+        # Finally
+        parsed: Tag = tags[0] if len(tags) == 1 else Root(*tags)
+        Parser.__strip_whitespace_text(parsed)
+        return parsed
+
+    @staticmethod
+    def __strip_whitespace_text(tag: Tag):
+        while len(tag) > 0 and type(tag[0]) == Text and tag[0].text == " ":
+            del tag[0]
+    
+        while len(tag) > 0 and type(tag[-1]) == Text and tag[-1].text == " ":
+            del tag[-1]
+    
+        for t in tag: Parser.__strip_whitespace_text(t)
 
     @staticmethod
     def parse(html: str) -> Tag:
@@ -271,7 +283,7 @@ class Parser:
         Returns:
             Tag
         """
-        return Parser.__parse(str(html))
+        return Parser.__parse(str(html).strip(" \t\n\r"))
 
     class State(IntEnum):
         TEXT = 0
