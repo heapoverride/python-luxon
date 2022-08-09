@@ -137,6 +137,45 @@ class Tag:
             Tag|None: Parent element or None if element has no parent
         """
         return self.__parent
+        
+    @property
+    def id(self) -> Any|None:
+        """Value of `id` attribute
+
+        Returns:
+            Any|None: Value of `id` attribute or None
+        """
+        return self.get_id()
+
+    @id.setter
+    def id(self, value: Any):
+        self.set_id(value)
+
+    @property
+    def name(self) -> Any|None:
+        """Value of `name` attribute
+
+        Returns:
+            Any|None: Value of `name` attribute or None
+        """
+        return self.get_name()
+
+    @name.setter
+    def name(self, value: Any):
+        self.set_name(value)
+
+    @property
+    def value(self) -> Any|None:
+        """Value of `value` attribute
+
+        Returns:
+            Any|None: Value of `value` attribute or None
+        """
+        return self.get_value()
+
+    @value.setter
+    def value(self, value: Any):
+        self.set_value(value)
 
     def set_text(self, text: Any):
         """Set displayed text and mark this element a text element
@@ -330,11 +369,11 @@ class Tag:
             self.__classes.remove(class_name)
         return self
 
-    def set_id(self, id: str):
-        """Set id attribute's value
+    def set_id(self, id: Any):
+        """Set value of `id` attribute
 
         Args:
-            id (str): ID
+            id (Any): New value
 
         Returns:
             self
@@ -342,19 +381,19 @@ class Tag:
         self.set("id", id)
         return self
 
-    def get_id(self):
-        """Get id attribute's value
+    def get_id(self) -> Any|None:
+        """Get value of `id` attribute
 
         Returns:
             Any|None
         """
         return self.get("id")
 
-    def set_name(self, name: str):
-        """Set name attribute's value
+    def set_name(self, name: Any):
+        """Set value of `name` attribute
 
         Args:
-            name (str): Name
+            name (Any): New value
 
         Returns:
             self
@@ -362,8 +401,8 @@ class Tag:
         self.set("name", name)
         return self
 
-    def get_name(self):
-        """Get name attribute's value
+    def get_name(self) -> Any|None:
+        """Get value of `name` attribute
 
         Returns:
             Any|None
@@ -371,10 +410,10 @@ class Tag:
         return self.get("name")
 
     def set_value(self, value: Any):
-        """Set value attribute's value
+        """Set value of `value` attribute
 
         Args:
-            value (str): Value
+            value (str): New value
 
         Returns:
             self
@@ -382,8 +421,8 @@ class Tag:
         self.set("value", value)
         return self
 
-    def get_value(self):
-        """Get value attribute's value
+    def get_value(self) -> Any|None:
+        """Get value of `value` attribute
 
         Returns:
             Any|None
@@ -414,6 +453,7 @@ class Tag:
         """
         if property in self.__styles:
             return self.__styles[property]
+
         return None
 
     def unset_style(self, property: str):
