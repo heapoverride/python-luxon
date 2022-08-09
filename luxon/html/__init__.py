@@ -200,7 +200,7 @@ class Tag:
         Returns:
             str: Text content
         """
-        return "".join([str(t) for t in self.find_all(lambda t: type(t) == Text, recurse, max_depth)])
+        return " ".join([str(t).strip() for t in self.find_all(lambda t: type(t) == Text, recurse, max_depth)]).strip()
 
     def add(self, *tags: Tag|list[Tag|str]|str):
         """Add child elements to this element

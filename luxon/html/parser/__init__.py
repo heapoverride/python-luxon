@@ -64,7 +64,7 @@ class Parser:
 
                     # Add text element to parent element or tags
                     if state != Parser.State.TEXT and temp != "":
-                        if temp.strip(" \t\r\n") != "":
+                        if temp.strip(" \t\n\r") != "":
                             text = Parser.__create_text(temp, parent=tag)
                             if tag != None:
                                 tag.add(text)
@@ -253,7 +253,7 @@ class Parser:
 
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
-        if temp.strip(" \t\r\n") != "":
+        if temp != "" and temp.strip(" \t\n\r") != "":
             tags.append(Parser.__create_text(temp, parent=tag))
 
         return tags[0] if len(tags) == 1 else Root(*tags)
