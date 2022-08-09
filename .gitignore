@@ -1,5 +1,4 @@
 __pycache__/
-test/
 *.py[cod]
 *.bak
 /main.py
