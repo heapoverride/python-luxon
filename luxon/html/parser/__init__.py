@@ -1,6 +1,7 @@
 from enum import IntEnum
 from luxon.html.tags import *
 from html import unescape
+import re
 
 class Parser:
     @staticmethod
@@ -64,7 +65,7 @@ class Parser:
                     # Add text element to parent element or tags
                     if state != Parser.State.TEXT and temp != "":
                         if temp.strip(" \t\r\n") != "":
-                            text = Parser.__create_text(temp)
+                            text = Parser.__create_text(temp, parent=tag)
                             if tag != None:
                                 tag.add(text)
                             else:
@@ -253,7 +254,7 @@ class Parser:
         # Check if we have remaining text in temp 
         # and if we do, we add new text node
         if temp.strip(" \t\r\n") != "":
-            tags.append(Parser.__create_text(temp))
+            tags.append(Parser.__create_text(temp, parent=tag))
 
         return tags[0] if len(tags) == 1 else Root(*tags)
 
@@ -398,7 +399,20 @@ class Parser:
         return None
 
     @staticmethod
-    def __create_text(text: str):
+    def __trim(text: str):
+        length = len(text)
+        text = re.sub(TRIM_PATTERN, " ", text)
+
+        if length != len(text):
+            return Parser.__trim(text)
+
+        return text
+
+    @staticmethod
+    def __create_text(text: str, parent: Tag = None):
+        if type(parent) != Pre:
+            text = Parser.__trim(text)
+
         return Text(unescape(text))
 
     @staticmethod
@@ -421,3 +435,5 @@ class Parser:
         if known_type != None:
             tag.__class__ = known_type
         return tag
+
+TRIM_PATTERN = re.compile(r"\s\s|\n|\r")
