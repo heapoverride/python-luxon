@@ -320,7 +320,7 @@ class Tag:
         Returns:
             self
         """
-        self.__attributes[attribute] = value
+        self.__attributes[attribute.lower()] = value
         return self
 
     def get(self, attribute: str) -> Any|None:
@@ -332,6 +332,8 @@ class Tag:
         Returns:
             Any|None
         """
+        attribute = attribute.lower()
+
         if attribute in self.__attributes:
             return self.__attributes[attribute]
         return None
@@ -343,8 +345,12 @@ class Tag:
             self
         """
         for attribute in attributes:
+            attribute = attribute.lower()
+            print("debug", attribute)
+
             if attribute in self.__attributes:
                 del self.__attributes[attribute]
+
         return self
 
     def set_classes(self, *class_names: str):
