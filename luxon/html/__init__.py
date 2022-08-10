@@ -177,6 +177,19 @@ class Tag:
     def value(self, value: Any):
         self.set_value(value)
 
+    @property
+    def classes(self) -> list[str]:
+        """Get class list
+
+        Returns:
+            list[str]: Class list
+        """
+        return self.get_classes()
+
+    @classes.setter
+    def classes(self, value: list[str]):
+        self.set_classes(*value)
+        
     def set_text(self, text: Any):
         """Set displayed text and mark this element a text element
 
@@ -340,8 +353,16 @@ class Tag:
         Returns:
             self
         """
-        self.__classes = list(class_names)
+        self.__classes = [*class_names]
         return self
+
+    def get_classes(self) -> list[str]:
+        """Get class list
+
+        Returns:
+            list[str]: Class list
+        """
+        return self.__classes
 
     def add_class(self, class_name: str):
         """Add class to class list
@@ -625,7 +646,7 @@ class Tag:
         Returns:
             Tag|None: Found element or None if no element was found
         """
-        return self.find(lambda tag: all(item in tag.classes for item in class_name), 
+        return self.find(lambda tag: all(item in tag.__classes for item in class_name), 
             recurse=recurse, 
             max_depth=max_depth)
 
@@ -640,7 +661,7 @@ class Tag:
         Returns:
             list[Tag]: List of found elements
         """
-        return self.find_all(lambda tag: all(item in tag.classes for item in class_name), 
+        return self.find_all(lambda tag: all(item in tag.__classes for item in class_name), 
             recurse=recurse, 
             max_depth=max_depth)
 

@@ -98,6 +98,8 @@ class Parser:
                             # Void tags must not have a body
                             tag.nobody = True
 
+                        Parser.__update_tag_props(tag)
+
                         if tag.nobody:
                             # Has no body
                             matches.append(((open_begin, pos), (-1, pos)))
@@ -259,6 +261,13 @@ class Parser:
         parsed: Tag = tags[0] if len(tags) == 1 else Root(*tags)
         Parser.__strip_whitespace_text(parsed)
         return parsed
+
+    @staticmethod
+    def __update_tag_props(tag: Tag):
+        # get classes
+        att_class = tag.get("class")
+        if att_class != None:
+            tag.classes = str(att_class).split(" ")
 
     @staticmethod
     def __strip_whitespace_text(tag: Tag):
