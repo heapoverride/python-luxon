@@ -1,7 +1,9 @@
+from __future__ import annotations
+from typing import Callable
 from enum import IntEnum
-from luxon.html.tags import *
 from html import unescape
 import re
+from luxon.html.tags import *
 
 class Parser:
     @staticmethod

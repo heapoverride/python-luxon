@@ -1,5 +1,6 @@
 from __future__ import annotations
-from luxon.html import *
+from typing import Any
+from luxon.html.tag import Tag, Text
 
 class Html(Tag):
     """Represents the root (top-level element) of an HTML document"""
