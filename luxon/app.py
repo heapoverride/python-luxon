@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Callable
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qsl
 import socketserver
 from luxon.html.tag import Tag
 
@@ -38,12 +39,20 @@ class App:
     def handle_request(self, _req: App.__RequestHandler):
         req = App.Request(_req)
         res = App.Response(_req)
+        path = req.path.split("?")[0] # path without query string
+        found = False
 
         for route in self.__routes:
-            if req.method == route.method and req.path == route.path:
+            if req.method == route.method and path == route.path:
+                found = True
                 value = route.handler(req, res)
                 if value != None: res.write(value)
-                _req.wfile.flush()
+
+        if not found:
+            res.status = (404, "Route not Found")
+            res.write()
+
+        _req.wfile.flush()
 
     class Route:
         def __init__(self, *, method: str = "GET", path: str = "/", handler: Callable[[App.Re]] = None) -> None:
@@ -74,6 +83,10 @@ class App:
             self.__method = req.command
             self.__path = req.path
             self.__address = req.client_address
+            self.__headers = {key: str(value) for key, value in req.headers.items()}
+            
+            url = urlparse(self.path)
+            self.__query = dict(parse_qsl(url.query))
 
         @property
         def version(self) -> str:
@@ -91,6 +104,16 @@ class App:
             return self.__path
 
         @property
+        def query(self) -> dict[str, str]:
+            """HTTP query string"""
+            return self.__query
+
+        @property
+        def headers(self) -> dict[str, str]:
+            """HTTP request headers"""
+            return self.__headers
+
+        @property
         def address(self) -> tuple[str, int]:
             """Remote address"""
             return self.__address
@@ -104,7 +127,21 @@ class App:
                 "Content-Type": "text/html"
             }
 
-        def send_response(self, status: int = 200, message: str = None):
+        @property
+        def status(self) -> tuple[int, str]:
+            """HTTP response status"""
+            return self.__status
+
+        @status.setter
+        def status(self, value: tuple[int, str]):
+            self.__status = value
+
+        @property
+        def headers(self) -> dict[str, str]:
+            """HTTP response headers"""
+            return self.__headers
+
+        def __send_response(self, status: int = 200, message: str = None):
             """Send response status code
 
             Args:
@@ -113,7 +150,7 @@ class App:
             """
             self.__handler.send_response(status, message)
 
-        def send_headers(self, headers: dict[str, str]):
+        def __send_headers(self, headers: dict[str, str]):
             """Send response headers
 
             Args:
@@ -124,25 +161,7 @@ class App:
 
             self.__handler.end_headers()
 
-        def set_status(self, status: int, message: str = None):
-            """Set response status code
-
-            Args:
-                status (int): _description_
-                message (str, optional): _description_. Defaults to None.
-            """
-            self.__status = (status, message)
-
-        def set_header(self, header: str, value: str):
-            """Set response header value
-
-            Args:
-                header (str): _description_
-                value (str): _description_
-            """
-            self.__headers[header] = value
-
-        def write(self, data: str|bytes|Tag):
+        def write(self, data: str|bytes|Tag = None):
             """Write response body
 
             Args:
@@ -152,14 +171,15 @@ class App:
             if not self.__headers_written:
                 # Write response status and headers if they're not written yet
                 self.__headers_written = True
-                self.send_response(*self.__status)
-                self.send_headers(self.__headers)
+                self.__send_response(*self.__status)
+                self.__send_headers(self.__headers)
 
-            # Convert data to bytes
-            if issubclass(type(data), Tag):
-                data = data.html().encode(encoding="utf-8")
-            elif type(data) == str:
-                data = data.encode(encoding="utf-8")
+            if data != None:
+                # Convert data to bytes
+                if issubclass(type(data), Tag):
+                    data = data.html().encode(encoding="utf-8")
+                elif type(data) == str:
+                    data = data.encode(encoding="utf-8")
 
-            # Write response body
-            self.__handler.wfile.write(data)
+                # Write response body
+                self.__handler.wfile.write(data)
