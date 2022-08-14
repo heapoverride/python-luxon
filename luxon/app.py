@@ -84,7 +84,7 @@ class App:
             self.__path = req.path
             self.__address = req.client_address
             self.__headers = {key: str(value) for key, value in req.headers.items()}
-            
+
             url = urlparse(self.path)
             self.__query = dict(parse_qsl(url.query))
 
@@ -165,8 +165,7 @@ class App:
             """Write response body
 
             Args:
-                data (str | bytes | Tag): _description_
-                content_type (str, optional): _description_. Defaults to "text/html".
+                data (str | bytes | Tag | None): Response body data or None if empty response
             """
             if not self.__headers_written:
                 # Write response status and headers if they're not written yet
