@@ -3,4 +3,5 @@ __pycache__/
 *.bak
 /main.py
 /test
+/myapp
 *.test.*
