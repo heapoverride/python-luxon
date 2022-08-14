@@ -11,15 +11,6 @@ class App:
         super().__init__()
         self.__routes: list[App.Route] = []
 
-    @property
-    def routes(self) -> list[App.Route]:
-        """Get list of routes
-
-        Returns:
-            list[Router.Route]: List of routes
-        """
-        return self.__routes
-
     def route(self, method: str = "GET", path: str = "/"):
         """Add handler to new route
 
@@ -48,7 +39,7 @@ class App:
         req = App.Request(_req)
         res = App.Response(_req)
 
-        for route in self.routes:
+        for route in self.__routes:
             if req.method == route.method and req.path == route.path:
                 value = route.handler(req, res)
                 if value != None: res.write(value)
