@@ -14,6 +14,13 @@ class Request:
         self.__query = dict(parse_qsl(self.__url.query))
         self.__headers = {key: str(value) for key, value in req.headers.items()}
         self.__groups = None
+        self.__body = self.__read_body()
+
+    def __read_body(self) -> bytes | None:
+        if "Content-Length" not in self.headers:
+            return None
+
+        return self.__handler.rfile.read(int(self.headers["Content-Length"]))
 
     @property
     def version(self) -> str:
@@ -39,6 +46,11 @@ class Request:
     def headers(self) -> dict[str, str]:
         """HTTP request headers"""
         return self.__headers
+
+    @property
+    def body(self) -> bytes | None:
+        """HTTP request body"""
+        return self.__body
 
     @property
     def address(self) -> tuple[str, int]:
