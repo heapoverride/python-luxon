@@ -1,5 +1,5 @@
 from __future__ import annotations
-from urllib.parse import urlparse, parse_qsl
+from urllib.parse import urlparse, parse_qsl, unquote
 from luxon.http.handler import Handler
 import re
 
@@ -10,7 +10,7 @@ class Request:
         self.__method = req.command
         self.__address = req.client_address
         self.__url = urlparse(req.path)
-        self.__path = self.__url.path
+        self.__path = unquote(self.__url.path)
         self.__query = dict(parse_qsl(self.__url.query))
         self.__headers = {key: str(value) for key, value in req.headers.items()}
         self.__groups = None
