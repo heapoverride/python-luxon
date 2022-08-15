@@ -1,7 +1,9 @@
 from __future__ import annotations
 from urllib.parse import urlparse, parse_qsl, unquote
-from luxon.http.handler import Handler
 import re
+import json
+from luxon.http.handler import Handler
+from luxon.http.headers import ContentTypeHeader
 
 class Request:
     def __init__(self, req: Handler) -> None:
@@ -14,12 +16,22 @@ class Request:
         self.__query = dict(parse_qsl(self.__url.query))
         self.__headers = {key: str(value) for key, value in req.headers.items()}
         self.__groups = None
+
         self.__body = self.__read_body()
+
+        if "Content-Type" in self.headers:
+            header = ContentTypeHeader.parse(self.headers["Content-Type"])
+            #print(header.type, header.fields)
+            if header.type in ("application/x-www-form-urlencoded",):
+                # query string
+                self.__body = dict(parse_qsl(self.__body))
+            elif header.type in ("application/json",):
+                # json
+                self.__body = json.loads(self.__body)
 
     def __read_body(self) -> bytes | None:
         if "Content-Length" not in self.headers:
             return None
-
         return self.__handler.rfile.read(int(self.headers["Content-Length"]))
 
     @property
@@ -48,7 +60,7 @@ class Request:
         return self.__headers
 
     @property
-    def body(self) -> bytes | None:
+    def body(self) -> bytes | dict[str, str] | None:
         """HTTP request body"""
         return self.__body
 
