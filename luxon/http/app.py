@@ -51,8 +51,9 @@ class App:
 
         if path.startswith(self.path):
             # app path
-            path = path[len(self.path):]
-            if path == "": path = "/"
+            if self.path != "/":
+                path = path[len(self.path):]
+                if path == "": path = "/"
 
             for route in self.__routes:
                 # check request method
