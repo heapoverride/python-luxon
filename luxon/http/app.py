@@ -77,7 +77,7 @@ class App:
 
         # route not found
         if not found:
-            res.status = (404, "Route not Found")
+            res.status = (404, "Route Not Found")
             res.write()
 
         # flush response buffer
