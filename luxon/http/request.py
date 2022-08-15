@@ -8,13 +8,12 @@ class Request:
         self.__handler = req
         self.__version = req.request_version
         self.__method = req.command
-        self.__path = req.path
         self.__address = req.client_address
+        self.__url = urlparse(req.path)
+        self.__path = self.__url.path
+        self.__query = dict(parse_qsl(self.__url.query))
         self.__headers = {key: str(value) for key, value in req.headers.items()}
         self.__groups = None
-
-        url = urlparse(self.path)
-        self.__query = dict(parse_qsl(url.query))
 
     @property
     def version(self) -> str:
