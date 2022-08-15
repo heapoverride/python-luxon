@@ -10,6 +10,9 @@ class Response:
             "Content-Type": "text/html"
         }
 
+        # Set server version ("Luxon Python/#.##.##")
+        req.server_version = "Luxon"
+
     @property
     def status(self) -> tuple[int, str]:
         """HTTP response status"""
