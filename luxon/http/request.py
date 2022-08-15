@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 from urllib.parse import urlparse, parse_qsl, unquote
 import re
 import json
@@ -60,7 +61,7 @@ class Request:
         return self.__headers
 
     @property
-    def body(self) -> bytes | dict[str, str] | None:
+    def body(self) -> bytes | list[Any] | dict[str, Any] | None:
         """HTTP request body"""
         return self.__body
 
