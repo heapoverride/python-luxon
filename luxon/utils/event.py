@@ -7,18 +7,24 @@ class Event:
     def __init__(self) -> None:
         self.__events: list[Callable] = []
 
+    def add(self, handler: Callable):
+        self.__events.append(handler)
+    
+    def remove(self, handler: Callable):
+        if handler in self.__events:
+            self.__events.remove(handler)
+        return self
+
     def __add__(self, other: Callable) -> Event:
         """Use the += operator to add event handler to this event
         """
-        self.__events.append(other)
+        self.add(other)
         return self
 
     def __sub__(self, other: Callable) -> Event:
         """Use the -= operator to remove event handler from this event
         """
-        if other in self.__events:
-            self.__events.remove(other)
-        return self
+        self.remove(other)
 
     def __call__(self, *args, **kwargs):
         """Call this instance like a function to fire all event handlers
