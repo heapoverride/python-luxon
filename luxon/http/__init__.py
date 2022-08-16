@@ -3,3 +3,4 @@ from luxon.http.handler import Handler
 from luxon.http.route import Route
 from luxon.http.request import Request
 from luxon.http.response import Response
+from luxon.http.httpserver import HttpServer

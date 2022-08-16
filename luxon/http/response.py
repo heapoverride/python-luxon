@@ -1,5 +1,6 @@
 from luxon.http.handler import Handler
 from luxon.html.tag import Tag
+import mimetypes
 
 class Response:
     def __init__(self, req: Handler) -> None:
@@ -68,3 +69,18 @@ class Response:
 
             # Write response body
             self.__handler.wfile.write(data)
+
+    def send_file(self, path: str):
+        type, encoding = mimetypes.guess_type(path)
+
+        if type != None:
+            self.headers["Content-Type"] = type
+
+            with open(path, "rb") as f:
+                while True:
+                    buffer = f.read(2048)
+
+                    if not buffer: 
+                        break
+
+                    self.write(buffer)
