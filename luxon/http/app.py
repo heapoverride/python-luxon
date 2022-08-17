@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Any, Callable
 from luxon.http.server import HttpServer
-from luxon.http import Request, Response
+from luxon.http.request import Request
+from luxon.http.response import Response
 from luxon.http.route import Route
 
 class App:
@@ -47,6 +48,8 @@ class App:
 
     def __request_handler(self, request: Request, response: Response):
         print("App handle request")
+        print(request)
+        print(response)
 
     """def __request_handler(self, request: Request, response: Response):
         path = request.path.split("?")[0] # path without query string
