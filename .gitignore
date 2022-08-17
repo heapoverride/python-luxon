@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 *.bak
+*.old
 /main.py
 /test
 /myapp
