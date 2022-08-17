@@ -45,9 +45,6 @@ class App:
         self.__server.start()
 
     def __request_handler(self, request: Request, response: Response):
-        pass
-
-    """def __request_handler(self, request: Request, response: Response):
         path = request.path.split("?")[0] # path without query string
         found = False
 
@@ -75,13 +72,10 @@ class App:
                 # check path
                 elif path == route.path:
                     found = True
-                    value = route.handler(req, response)
+                    value = route.handler(request, response)
                     if value != None: response.write(value)
 
         # route not found
         if not found:
-            response.status = (404, "Route Not Found")
-            response.write()
-
-        # flush response buffer
-        _req.wfile.flush()"""
+            response.status.code = 404
+            response.status.message = "Route Not Found"

@@ -1,5 +1,8 @@
 from __future__ import annotations
 from typing import Any
+from urllib.parse import urlparse, parse_qsl, unquote
+import re
+import json
 import socket
 from luxon.consts import *
 
@@ -12,6 +15,7 @@ class Request:
         self.__sock = socket
         self.__method: str = None
         self.__path: str = None
+        self.__query: dict[str, str] = None
         self.__version: str = None
         self.__headers: dict[str, str] = {}
         self.__body: Any = None
@@ -26,6 +30,11 @@ class Request:
 
                 header, value = line.split(": ")
                 self.__headers[header] = value
+
+        # Parse and unquote path and query string
+        url = urlparse(self.__path)
+        self.__path = unquote(url.path)
+        self.__query = dict(parse_qsl(url.query))
 
     @property
     def socket(self) -> socket.socket:
