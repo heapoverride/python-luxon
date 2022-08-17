@@ -1,16 +1,23 @@
 from __future__ import annotations
 from typing import Callable
 from luxon.utils import Event
+from luxon.consts import *
 import socket
 import threading
 import ipaddress
-
-BUFFER_SIZE = 2048
+from luxon.http.request import Request
+from luxon.http.response import Response
 
 class HttpServer():
     def __init__(self):
+        self.__on_request = Event()
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    @property
+    def on_request(self) -> Callable[[Request, Response], None]:
+        """Request event handler"""
+        return self.__on_request
 
     def bind(self, server_address: tuple[str, int]):
         """Bind server to specific address and port"""
@@ -33,8 +40,15 @@ class HttpServer():
 
     def __accept(self, sock: socket.socket, address: tuple[str, int]):
         """Accept incoming connection"""
-        #print(f"Accepted connection from {address}")
+        print(f"Accepted connection from {address}")
 
-        while True:
-            buffer = sock.recv(BUFFER_SIZE)
-            if not bytes: break
+        # read request headers
+        request = Request(sock)
+        response = Response(sock)
+
+        # Call request event handler
+        self.__on_request(request, response)
+
+        # Close socket if 'Connection: close'
+        if "Connection" in request.headers and request.headers["Connection"] == "close":
+            sock.close()

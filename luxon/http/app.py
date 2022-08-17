@@ -1,18 +1,20 @@
 from __future__ import annotations
 from typing import Any, Callable
-from http.server import ThreadingHTTPServer
-from luxon.http.handler import Handler
+from luxon.http.server import HttpServer
+from luxon.http import Request, Response
 from luxon.http.route import Route
-from luxon.http.request import Request
-from luxon.http.response import Response
 
 class App:
     """Luxon application"""
     def __init__(self, path: str = "/") -> None:
         """Create new Luxon application"""
         super().__init__()
+
         self.__path = path
         self.__routes: list[Route] = []
+
+        self.__server = HttpServer()
+        self.__server.on_request += self.__request_handler
 
     @property
     def path(self) -> str:
@@ -38,15 +40,16 @@ class App:
         Args:
             server_address (tuple[str, int]): _description_
         """
-        with ThreadingHTTPServer(server_address, Handler) as httpd:
-            #httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True, certfile="cert.pem", keyfile="key.pem")
-            httpd.app = self
-            httpd.serve_forever()
+        print("Luxon application started.")
 
-    def handle_request(self, _req: Handler):
-        req = Request(_req)
-        res = Response(_req)
-        path = req.path.split("?")[0] # path without query string
+        self.__server.bind(server_address)
+        self.__server.start()
+
+    def __request_handler(self, request: Request, response: Response):
+        print("App handle request")
+
+    """def __request_handler(self, request: Request, response: Response):
+        path = request.path.split("?")[0] # path without query string
         found = False
 
         if path.startswith(self.path):
@@ -57,7 +60,7 @@ class App:
 
             for route in self.__routes:
                 # check request method
-                if req.method != route.method:
+                if request.method != route.method:
                     continue
 
                 if route.pattern != None:
@@ -65,21 +68,21 @@ class App:
                     match = route.pattern.search(path)
 
                     if match != None:
-                        req.groups = match.groups()
+                        request.groups = match.groups()
                         found = True
-                        value = route.handler(req, res)
-                        if value != None: res.write(value)
+                        value = route.handler(request, response)
+                        if value != None: response.write(value)
 
                 # check path
                 elif path == route.path:
                     found = True
-                    value = route.handler(req, res)
-                    if value != None: res.write(value)
+                    value = route.handler(req, response)
+                    if value != None: response.write(value)
 
         # route not found
         if not found:
-            res.status = (404, "Route Not Found")
-            res.write()
+            response.status = (404, "Route Not Found")
+            response.write()
 
         # flush response buffer
-        _req.wfile.flush()
+        _req.wfile.flush()"""

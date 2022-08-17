@@ -1,39 +1,46 @@
 from __future__ import annotations
 from typing import Any
-from urllib.parse import urlparse, parse_qsl, unquote
-import re
-import json
-from luxon.http.handler import Handler
-from luxon.http.headers import ContentTypeHeader
+import socket
+from luxon.consts import *
+
+# Requests with body/payload (like 'POST') must include 
+# 'Content-Length' header or use 'Transfer-Encoding: chunked'. 
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding 
 
 class Request:
-    def __init__(self, req: Handler) -> None:
-        self.__handler = req
-        self.__version = req.request_version
-        self.__method = req.command
-        self.__address = req.client_address
-        self.__url = urlparse(req.path)
-        self.__path = unquote(self.__url.path)
-        self.__query = dict(parse_qsl(self.__url.query))
-        self.__headers = {key: str(value) for key, value in req.headers.items()}
-        self.__groups = None
+    def __init__(self, socket: socket.socket) -> None:
+        self.__sock = socket
+        self.__method: str = None
+        self.__path: str = None
+        self.__version: str = None
+        self.__headers: dict[str, str] = {}
+        self.__body: Any = None
 
-        self.__body = self.__read_body()
+        # Read request headers
+        with self.__sock.makefile("r", buffering=BUFFER_SIZE, encoding="utf-8", newline="\n") as f:
+            self.__method, self.__path, self.__version = f.readline().split(" ")
 
-        if "Content-Type" in self.headers:
-            header = ContentTypeHeader.parse(self.headers["Content-Type"])
-            #print(header.type, header.fields)
-            if header.type in ("application/x-www-form-urlencoded",):
-                # query string
-                self.__body = dict(parse_qsl(self.__body))
-            elif header.type in ("application/json",):
-                # json
-                self.__body = json.loads(self.__body)
+            while True:
+                line = f.readline().strip()
+                if line == "": break
 
-    def __read_body(self) -> bytes | None:
-        if "Content-Length" not in self.headers:
-            return None
-        return self.__handler.rfile.read(int(self.headers["Content-Length"]))
+                header, value = line.split(": ")
+                self.__headers[header] = value
+
+    @property
+    def socket(self) -> socket.socket:
+        """Socket associated with this request"""
+        return self.__sock
+
+    @property
+    def method(self) -> str:
+        """Request method"""
+        return self.__method
+
+    @property
+    def path(self) -> str:
+        """Request path"""
+        return self.__path
 
     @property
     def version(self) -> str:
@@ -41,40 +48,23 @@ class Request:
         return self.__version
 
     @property
-    def method(self) -> str:
-        """HTTP method"""
-        return self.__method
-
-    @property
-    def path(self) -> str:
-        """HTTP path"""
-        return self.__path
-
-    @property
-    def query(self) -> dict[str, str]:
-        """HTTP query string"""
-        return self.__query
-
-    @property
     def headers(self) -> dict[str, str]:
-        """HTTP request headers"""
+        """Request headers"""
         return self.__headers
 
     @property
-    def body(self) -> bytes | list[Any] | dict[str, Any] | None:
-        """HTTP request body"""
+    def body(self) -> Any:
+        """Request body"""
         return self.__body
 
-    @property
-    def address(self) -> tuple[str, int]:
-        """Remote address"""
-        return self.__address
+    def read(self, length: int = BUFFER_SIZE) -> bytes:
+        """Read data from socket associated with this request. 
+        The amount of bytes read can be smaller than the buffer size.
 
-    @property
-    def groups(self) -> tuple[re.Match]:
-        """Path regular expression groups"""
-        return self.__groups
+        Args:
+            length (int, optional): Buffer length. Defaults to BUFFER_SIZE.
 
-    @groups.setter
-    def groups(self, value: tuple[re.Match]):
-        self.__groups = value
+        Returns:
+            bytes
+        """
+        return self.__sock.recv(length)
