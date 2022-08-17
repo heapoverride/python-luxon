@@ -41,15 +41,11 @@ class App:
         Args:
             server_address (tuple[str, int]): _description_
         """
-        print("Luxon application started.")
-
         self.__server.bind(server_address)
         self.__server.start()
 
     def __request_handler(self, request: Request, response: Response):
-        print("App handle request")
-        print(request)
-        print(response)
+        pass
 
     """def __request_handler(self, request: Request, response: Response):
         path = request.path.split("?")[0] # path without query string

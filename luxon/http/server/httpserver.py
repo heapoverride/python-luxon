@@ -15,9 +15,13 @@ class HttpServer():
         self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     @property
-    def on_request(self) -> Callable[[Request, Response], None]:
+    def on_request(self):
         """Request event handler"""
         return self.__on_request
+
+    @on_request.setter
+    def on_request(self, value):
+        self.__on_request = value
 
     def bind(self, server_address: tuple[str, int]):
         """Bind server to specific address and port"""
@@ -47,7 +51,7 @@ class HttpServer():
         response = Response(sock)
 
         # Call request event handler
-        self.__on_request(request, response)
+        self.on_request(request, response)
 
         # Close socket if 'Connection: close'
         if "Connection" in request.headers and request.headers["Connection"] == "close":

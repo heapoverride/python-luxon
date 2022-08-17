@@ -25,6 +25,7 @@ class Event:
         """Use the -= operator to remove event handler from this event
         """
         self.remove(other)
+        return self
 
     def __call__(self, *args, **kwargs):
         """Call this instance like a function to fire all event handlers
