@@ -18,6 +18,7 @@ class Request:
         self.__query: dict[str, str] = None
         self.__version: str = None
         self.__headers: dict[str, str] = {}
+        self.__groups: tuple[re.Match] = None
         self.__body: Any = None
 
         # Read request headers
@@ -57,9 +58,23 @@ class Request:
         return self.__version
 
     @property
+    def query(self) -> dict[str, str]:
+        """HTTP query string"""
+        return self.__query
+
+    @property
     def headers(self) -> dict[str, str]:
         """Request headers"""
         return self.__headers
+
+    @property
+    def groups(self) -> tuple[re.Match]:
+        """Path regular expression groups"""
+        return self.__groups
+
+    @groups.setter
+    def groups(self, value: tuple[re.Match]):
+        self.__groups = value
 
     @property
     def body(self) -> Any:

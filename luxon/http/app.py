@@ -4,6 +4,7 @@ from luxon.http.server import HttpServer
 from luxon.http.request import Request
 from luxon.http.response import Response
 from luxon.http.route import Route
+from luxon.html.tag import Tag
 
 class App:
     """Luxon application"""
@@ -28,6 +29,7 @@ class App:
         Args:
             method (str, optional): HTTP method. Defaults to `"GET"`.
             path (str, optional): HTTP path. Defaults to `"/"`.
+            pattern (str, optional): Regular expression pattern. Defaults to None.
         """
         def decorator(func: Callable[[Request, Response], Any]) -> Callable[[Request, Response], Any]:
             self.__routes.append(Route(handler=func, method=method, path=path, pattern=pattern))
@@ -39,10 +41,17 @@ class App:
         """Start Luxon application
 
         Args:
-            server_address (tuple[str, int]): _description_
+            server_address (tuple[str, int]): Address and port to listen on
         """
         self.__server.bind(server_address)
         self.__server.start()
+
+    def __get_bytes(self, data: str|bytes|Tag) -> bytes|None:
+        if issubclass(type(data), Tag):
+            return data.html().encode(encoding="utf-8")
+        elif type(data) == str:
+            return data.encode(encoding="utf-8")
+        return None
 
     def __request_handler(self, request: Request, response: Response):
         path = request.path.split("?")[0] # path without query string
@@ -64,18 +73,23 @@ class App:
                     match = route.pattern.search(path)
 
                     if match != None:
-                        request.groups = match.groups()
                         found = True
+                        request.groups = match.groups()
                         value = route.handler(request, response)
-                        if value != None: response.write(value)
+
+                        if value != None: 
+                            response.write_all(self.__get_bytes(value))
 
                 # check path
                 elif path == route.path:
                     found = True
                     value = route.handler(request, response)
-                    if value != None: response.write(value)
+
+                    if value != None: 
+                        response.write_all(self.__get_bytes(value))
 
         # route not found
         if not found:
             response.status.code = 404
             response.status.message = "Route Not Found"
+            response.write_all("Route Not Found")

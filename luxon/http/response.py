@@ -1,11 +1,16 @@
 from __future__ import annotations
 import socket
+import mimetypes
 
 class Response:
     def __init__(self, socket: socket.socket) -> None:
         self.__sock = socket
         self.__status = Response.Status()
-        self.__headers: dict[str, str] = {}
+        self.__headers: dict[str, str|int] = {
+            "Server":       "Luxon",
+            "Connection":   "keep-alive",
+            "Content-Type": "text/html; charset=utf-8"
+        }
         self.__headers_sent = False
 
     @property
@@ -19,25 +24,70 @@ class Response:
         return self.__status
 
     @property
-    def headers(self) -> dict[str, str]:
+    def headers(self) -> dict[str, str|int]:
         """Response headers"""
         return self.__headers
 
     def __send_line(self, header: str):
         self.socket.send(f"{header}\r\n".encode(encoding="utf-8"))
 
+    def __send_headers(self):
+        if not self.__headers_sent:
+            self.__send_line(f"HTTP/1.1 {self.__status.code} {self.__status.message}")
+
+            for header, value in self.__headers.items():
+                self.__send_line(f"{header}: {value}")
+                
+            self.__send_line("")
+            self.__headers_sent = True
+
     def send_headers(self):
         """Send response headers
         """
         if self.__headers_sent:
             raise Exception("Response headers can only be sent once per request.")
+        self.__send_headers()
 
-        self.__send_line(f"HTTP/1.1 {self.__status.code} {self.__status.message}")
+    def write(self, data: bytes):
+        """Write response body
 
-        for header, value in self.__headers:
-            self.__send_line(f"{header}: {value}")
+        Args:
+            data (str | bytes | Tag | None): Response body data or None if empty response
+        """
+        if not self.__headers_sent:
+            # Send response status and headers 
+            # if they're not sent yet
+            self.send_headers()
 
-        self.__headers_sent = True
+        # Write response body
+        self.socket.send(data)
+
+    def write_all(self, data: bytes):
+        self.headers["Content-Length"] = len(data)
+        self.write(data)
+
+    def send_file(self, path: str):
+        """Send file to client
+
+        Args:
+            path (str): Path to file
+        """
+        with open(path, "rb") as f:
+            type, encoding = mimetypes.guess_type(path)
+            self.headers["Content-Type"] = type if type != None else "application/octet-stream"
+            f.seek(0, 2) # seek to end
+            self.headers["Content-Length"] = f.tell()
+            self.__send_headers()
+
+            f.seek(0, 0) # seek to beginning
+
+            while True:
+                buffer = f.read(2048)
+
+                if not buffer: 
+                    break
+
+                self.write(buffer)
 
     class Status:
         def __init__(self, code: int = 200, message: str = None) -> None:
